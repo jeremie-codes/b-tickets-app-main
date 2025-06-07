@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "B-ticket",
+    "slug": "b-ticket",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "jsEngine": "jsc",
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-web-browser",
+      [
+        "expo-font", 
+        {
+          "fonts": ["node_modules/@expo-google-fonts/montserrat/400Regular/Montserrat_400Regular.ttf"]
+        }
+      ]
+      
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
