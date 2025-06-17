@@ -1,9 +1,9 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, EventType, TicketType, CategoryType } from '@/types';
+import { User, EventType, TicketType, CategoryType, WishlistItem } from '@/types';
 
 // In a real app, this would be an environment variable
-const API_URL = 'https://api.bticket.example.com';
+const API_URL = 'https://testv2.b-tickets-app.com/api';
 
 // For demo purposes, we're simulating API calls
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -123,109 +123,295 @@ const mockTickets: TicketType[] = [
   }
 ];
 
+const mockWishlist: WishlistItem[] = [
+  {
+    id: 'wish1',
+    event: mockEvents[1],
+    addedDate: '2025-01-10'
+  },
+  {
+    id: 'wish2',
+    event: mockEvents[3],
+    addedDate: '2025-01-08'
+  }
+];
+
 // Auth functions
 export const login = async (email: string, password: string) => {
-  await delay(1000); // Simulate API delay
-  
-  // In a real app, this would be a POST request to the API
-  if (email === 'user@example.com' && password === 'password') {
-    const userData = {
-      id: '1',
-      name: 'John Doe',
-      email: 'user@example.com'
-    };
-    return { user: userData, token: 'mock-token-12345' };
+  try {
+
+    const response = await axios.post(`${API_URL}/auth/login`, {
+      email,
+      password,
+    });
+
+    const { token, user } = response.data.data;
+
+    //Stocke le token
+    // await AsyncStorage.setItem('@b_ticket_token', token);
+
+    //Configure les intercepteurs pour les requêtes futures
+    await setupApiInterceptors();
+
+    return { user, token };
+  } catch (error: any) {
+    // showNotification(error.response?.data?.message || 'Connexion échoouée !', 'error');
+    throw Error(error.response?.data?.message || 'Login failed');
   }
-  
-  // Simulate successful login for demo purposes
-  const userData = {
-    id: '1',
-    name: email.split('@')[0], // Use part of email as name
-    email: email
-  };
-  return { user: userData, token: 'mock-token-12345' };
 };
 
 export const register = async (name: string, email: string, password: string) => {
-  await delay(1500); // Simulate API delay
-  
-  // In a real app, this would be a POST request to the API
-  const userData = {
-    id: '1',
-    name,
-    email
-  };
-  return { user: userData, token: 'mock-token-12345' };
+
+  try {
+
+    const response = await axios.post(`${API_URL}/auth/register`, {
+      name,
+      email,
+      password,
+    });
+
+    const { token, user } = response.data.data;
+
+    //Stocke le token
+    await AsyncStorage.setItem('@b_ticket_token', token);
+
+    //Configure les intercepteurs pour les requêtes futures
+    await setupApiInterceptors();
+
+    return { user, token };
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Register failed');
+  }
+
 };
 
 export const logout = async (token: string) => {
-  await delay(800); // Simulate API delay
+  // await delay(800); // Simulate API delay
   // In a real app, this would be a POST request to the API
-  return { success: true };
+  try {
+    const response = await axios.post(`${API_URL}/logout`);
+
+    const { success } = response.data;
+
+    return { success: success };
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Logout failed');
+  }
+};
+
+// User profile functions
+export const updateUserProfile = async (userData: { name: string; email: string; profileImage?: string }) => {
+  await delay(1500); // Simulate API delay
+  // In a real app, this would be a PUT request to the API
+  return {
+    success: true,
+    user: {
+      id: '1',
+      ...userData
+    }
+  };
+};
+
+export const uploadProfileImage = async (base64Image: string) => {
+  await delay(2000);
+  // In real app, this would upload to your Laravel backend
+  const imageUrl = `https://api.bticket.example.com/uploads/profile_${Date.now()}.jpg`;
+  return { success: true, imageUrl };
 };
 
 export const deleteAccount = async (token: string) => {
-  await delay(1200); // Simulate API delay
+  // await delay(1200); // Simulate API delay
   // In a real app, this would be a DELETE request to the API
-  return { success: true };
+  try {
+    const response = await axios.post(`${API_URL}/account/delete`);
+
+    const { success } = response.data;
+
+    return { success: success };
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Logout failed');
+  }
 };
 
 // Events functions
 export const getEvents = async () => {
-  await delay(1000); // Simulate API delay
+  // await delay(1000); // Simulate API delay
   // In a real app, this would be a GET request to the API
-  return mockEvents;
+  // return mockEvents;
+  try {
+
+    const response = await axios.get(`${API_URL}/event/recents`);
+
+    const { recentEvents } = response.data;
+
+    return recentEvents;
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Register failed');
+  }
+};
+
+// Events functions
+export const getEventsPopular = async () => {
+  // await delay(1000); // Simulate API delay
+  // In a real app, this would be a GET request to the API
+  // return mockEvents;
+  try {
+
+    const response = await axios.get(`${API_URL}/favorites/popular`);
+
+    const { data } = response.data;
+
+    return data;
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Register failed');
+  }
 };
 
 export const getEventById = async (id: string) => {
-  await delay(800); // Simulate API delay
+  // await delay(800); // Simulate API delay
   // In a real app, this would be a GET request to the API
-  const event = mockEvents.find(event => event.id === id);
-  if (!event) {
-    throw new Error('Event not found');
+   try {
+
+    const response = await axios.get(`${API_URL}/events/${id}`);
+    const event = response.data.data;
+    // console.log(event)
+
+    // const event = mockEvents.find(event => event.id === id);
+    if (!event) {
+      throw new Error('Evénement non trouvé !');
+    }
+    return event;
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Loading failed');
   }
-  return event;
 };
 
 export const getFavorites = async () => {
-  await delay(1000); // Simulate API delay
-  // In a real app, this would be a GET request to the API
-  return mockEvents.filter(event => event.isFavorite);
+  try {
+
+    const response = await axios.get(`${API_URL}/favorites/list`);
+    const { data } = response.data;
+    
+    // console.log(data)
+    
+    return data;
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Loading failed');
+  }
 };
 
-export const toggleFavorite = async (eventId: string) => {
-  await delay(600); // Simulate API delay
+export const toggleFavorite = async (eventId: number, isFavorite: boolean) => {
+  // In a real app, this would be a POST request to the API
+  try {
+    let response;
+
+    if (isFavorite) {
+      response = await axios.post(`${API_URL}/favorites/remove/${eventId}`);
+        const { event } = response.data.data;
+        return { isFavorite: false }; 
+    }
+
+    response = await axios.post(`${API_URL}/favorites/add/${eventId}`);
+    const { event } = response.data.data;
+    return { isFavorite: true };   
+
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Loading failed');
+    throw new Error('Evénement non trouvé');
+  }
+};
+
+// Wishlist functions
+export const getWishlist = async () => {
+  await delay(1000); // Simulate API delay
+  // In a real app, this would be a GET request to the API
+  return mockWishlist;
+};
+
+export const addToWishlist = async (eventId: string) => {
+  await delay(800); // Simulate API delay
   // In a real app, this would be a POST request to the API
   const event = mockEvents.find(e => e.id === eventId);
-  if (event) {
-    event.isFavorite = !event.isFavorite;
-    return { isFavorite: event.isFavorite };
+  if (!event) {
+    throw new Error('Event not found');
   }
-  throw new Error('Event not found');
+  
+  const wishlistItem: WishlistItem = {
+    id: `wish${Date.now()}`,
+    event,
+    addedDate: new Date().toISOString().split('T')[0]
+  };
+  
+  mockWishlist.push(wishlistItem);
+  return { success: true, item: wishlistItem };
+};
+
+export const removeFromWishlist = async (wishlistItemId: string) => {
+  await delay(600); // Simulate API delay
+  // In a real app, this would be a DELETE request to the API
+  const index = mockWishlist.findIndex(item => item.id === wishlistItemId);
+  if (index > -1) {
+    mockWishlist.splice(index, 1);
+    return { success: true };
+  }
+  throw new Error('Wishlist item not found');
 };
 
 // Categories functions
 export const getCategories = async () => {
-  await delay(800); // Simulate API delay
+  // await delay(800); // Simulate API delay
   // In a real app, this would be a GET request to the API
-  return mockCategories;
+  // return mockCategories;
+
+  try {
+
+    const response = await axios.get(`${API_URL}/event/recents`);
+    const { recentEvents } = response.data;
+    
+    const categories : CategoryType[] = [];
+
+    recentEvents.forEach((el: any) => {
+      if (!categories.includes(el.category)) {
+        categories.push(el.category);
+      }
+    });
+    
+    console.log(categories)
+
+    
+    return categories;
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Loading failed');
+  }
 };
 
 // Tickets functions
 export const getUserTickets = async () => {
-  await delay(1200); // Simulate API delay
-  // In a real app, this would be a GET request to the API
-  return mockTickets;
+  try {
+
+    const response = await axios.get(`${API_URL}/tickets`);
+    const { data } = response.data;
+    
+    // console.log(data)
+    
+    return data;
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Loading failed');
+  }
 };
 
 export const getTicketById = async (id: string) => {
-  await delay(800); // Simulate API delay
-  // In a real app, this would be a GET request to the API
-  const ticket = mockTickets.find(ticket => ticket.id === id);
-  if (!ticket) { 
-    throw new Error('Ticket not found');
+   try {
+
+    const response = await axios.get(`${API_URL}/tickets/${id}`);
+    const { data } = response.data;
+    
+    // console.log(data)
+    
+    return data;
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Loading failed');
   }
-  return ticket;
 };
 
 // Payment function
@@ -253,3 +439,8 @@ export const setupApiInterceptors = async () => {
     }
   );
 };
+
+function capitalize(str: string) {
+  str = str.toLowerCase(); // met tout en minuscules d'abord
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

@@ -3,7 +3,7 @@ import { View, Text, ScrollView, ActivityIndicator, RefreshControl } from 'react
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
-import { getEvents } from '@/services/api';
+import { getEvents, getEventsPopular } from '@/services/api';
 import { EventType } from '@/types';
 import EventCard from '@/components/EventCard';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -19,8 +19,9 @@ export default function HomeScreen() {
   const loadEvents = async () => {
     try {
       const data = await getEvents();
-      setFeaturedEvents(data.filter(event => event.featured));
-      setUpcomingEvents(data.filter(event => !event.featured));
+      const datap = await getEventsPopular();
+      setFeaturedEvents(datap);
+      setUpcomingEvents(data);
     } catch (error) {
       showNotification('Chargement des événements échoué !', 'error');
     } finally {

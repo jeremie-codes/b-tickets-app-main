@@ -102,10 +102,10 @@ export default function TicketsScreen() {
             ) : (
               <View className="h-60 justify-center items-center">
                 <Text className="text-white font-['Montserrat-Medium'] text-lg">
-                  No tickets found
+                  Aucun tickets trouvé
                 </Text>
                 <Text className="text-gray-400 font-['Montserrat-Regular'] text-center mt-2">
-                  Book an event to see your tickets here
+                  Réservez un événement pour voir vos billets ici
                 </Text>
               </View>
             )}

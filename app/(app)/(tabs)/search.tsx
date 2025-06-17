@@ -67,9 +67,9 @@ export default function SearchScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-dark">
-      <View className="p-6">
+      <View className="p-6 flex-1">
         <Text className="text-white font-['Montserrat-Bold'] text-2xl mb-6">
-          Discover Events
+          Découvrir les événements
         </Text>
 
         <View className="relative mb-6">
@@ -95,7 +95,7 @@ export default function SearchScreen() {
             <TouchableOpacity
               key={category.id}
               onPress={() => selectCategory(category.id)}
-              className={`px-4 py-2 rounded-full mr-3 ${
+              className={`px-4 py-2 h-9 rounded-full mr-3 ${
                 selectedCategory === category.id ? 'bg-primary-600' : 'bg-background-card'
               }`}
             >

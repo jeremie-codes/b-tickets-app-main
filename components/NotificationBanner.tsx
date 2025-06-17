@@ -57,7 +57,7 @@ export default function NotificationBanner() {
       style={[styles.container, { transform: [{ translateY }] }]}
     >
       <View className="flex-row items-center justify-between">
-        <Text className="text-white font-['Montserrat-SemiBold'] flex-1 pr-4">
+        <Text className="text-white font-[Montserrat-SemiBold] flex-1 pr-4" style={{ fontFamily: 'Montserrat-SemiBold' }}>
           {notification.message}
         </Text>
         <TouchableOpacity onPress={hideNotification}>

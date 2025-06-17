@@ -14,9 +14,24 @@ export default function RegisterScreen() {
   const { register, isLoading } = useAuth();
   const { showNotification } = useNotification();
 
+  const isValidEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
   const handleRegister = async () => {
     if (!name || !email || !password) {
       showNotification('Remplissez tout les champs s\'ils vous plaît !', 'error');
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      showNotification('Email invalide !', 'error');
+      return;
+    }
+
+    if (password.length <= 7) {
+      showNotification('Les mot de passe doit avoir au moin 6 caractères !', 'error');
       return;
     }
 

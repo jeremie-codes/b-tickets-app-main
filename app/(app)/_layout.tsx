@@ -13,6 +13,9 @@ export default function AppLayout() {
         <Stack.Screen name="ticket" />
         <Stack.Screen name="event-details" />
         <Stack.Screen name="payment" />
+        <Stack.Screen name="account-settings" />
+        <Stack.Screen name="wishlist" />
+        <Stack.Screen name="help-support" />
       </Stack>
     </View>
   );

@@ -30,7 +30,7 @@ export default function FavoritesScreen() {
     <SafeAreaView className="flex-1 bg-background-dark">
       <View className="p-6">
         <Text className="text-white font-['Montserrat-Bold'] text-2xl mb-6">
-          Favorites
+          Favories
         </Text>
 
         {isLoading ? (
@@ -51,7 +51,7 @@ export default function FavoritesScreen() {
             ) : (
               <View className="h-60 justify-center items-center">
                 <Text className="text-white font-['Montserrat-Medium'] text-lg">
-                  Aucun favori trouvé
+                  Aucun événement favori trouvé
                 </Text>
                 <Text className="text-gray-400 font-['Montserrat-Regular'] text-center mt-2">
                   Ajoute des événements à tes favoris pour les retrouver ici.

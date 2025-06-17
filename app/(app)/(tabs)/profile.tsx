@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { ChevronRight, LogOut, Settings, Ticket, CreditCard, CircleHelp as HelpCircle } from 'lucide-react-native';
+import { ChevronRight, LogOut, Settings, Ticket, CreditCard, CircleHelp as HelpCircle, Heart } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 
@@ -94,11 +94,17 @@ export default function ProfileScreen() {
             <ProfileOption 
               icon={<Settings size={22} color="#8b5cf6" />} 
               title="Paramètres de Compte" 
+              onPress={() => router.push('/(app)/account-settings')}
             />
             <ProfileOption 
               icon={<Ticket size={22} color="#8b5cf6" />} 
               title="Mes Tickets" 
               onPress={() => router.push('/(app)/(tabs)/tickets')}
+            />
+            <ProfileOption 
+              icon={<Heart size={22} color="#8b5cf6" />} 
+              title="Wishlist" 
+              onPress={() => router.push('/(app)/wishlist')}
             />
           </View>
 
@@ -109,6 +115,7 @@ export default function ProfileScreen() {
             <ProfileOption 
               icon={<HelpCircle size={22} color="#8b5cf6" />} 
               title="Aide & Support" 
+              onPress={() => router.push('/(app)/help-support')}
             />
           </View>
 

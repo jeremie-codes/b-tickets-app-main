@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(authToken);
       await storeUserAndToken(userData, authToken);
     } catch (error) {
-      console.error('Login failed', error);
+      console.error('Connexion échouée !', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -84,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(authToken);
       await storeUserAndToken(userData, authToken);
     } catch (error) {
-      console.error('Registration failed', error);
+      console.error('Enregistrement échoué !', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -97,8 +97,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (token) {
         await apiLogout(token);
       }
+
       setUser(null);
       setToken(null);
+
       await clearUserAndToken();
     } catch (error) {
       console.error('Logout failed', error);
@@ -118,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(null);
       await clearUserAndToken();
     } catch (error) {
-      console.error('Delete account failed', error);
+      console.error('Suppression de compte échouée !', error);
       throw error;
     } finally {
       setIsLoading(false);

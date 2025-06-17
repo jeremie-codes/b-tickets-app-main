@@ -10,7 +10,7 @@ import { useNotification } from '@/contexts/NotificationContext';
 import { formatDate, formatTime } from '@/utils/formatters';
 
 export default function EventDetailsScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id } = useLocalSearchParams<{ id: any }>();
   const { showNotification } = useNotification();
   const [event, setEvent] = useState<EventType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,13 +19,12 @@ export default function EventDetailsScreen() {
 
   useEffect(() => {
     const loadEvent = async () => {
-      // console.log('details : ',id)
       if (!id) return;
       
       try {
         const data = await getEventById(id);
         setEvent(data);
-        setIsFavorite(data.isFavorite);
+        setIsFavorite(data.is_favorite);
       } catch (error) {
         showNotification('Erreur de chargement de l\'evénément !', 'error');
       } finally {
@@ -41,14 +40,14 @@ export default function EventDetailsScreen() {
     
     setIsTogglingFavorite(true);
     try {
-      const result = await toggleFavorite(event.id);
+      const result = await toggleFavorite(event.id, isFavorite);
       setIsFavorite(result.isFavorite);
       showNotification(
-        result.isFavorite ? 'Ajouté dans favoris' : 'Supprimer dans favoris',
+        result.isFavorite ? 'Évenément ajouté dans favoris' : 'Évenément supprimer dans favoris',
         'success'
       );
     } catch (error) {
-      showNotification('Error de mise à jour vers favoris', 'error');
+      showNotification('Error de mise à jour des favoris', 'error');
     } finally {
       setIsTogglingFavorite(false);
     }
@@ -95,7 +94,7 @@ export default function EventDetailsScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <Image
-            source={{ uri: event.image }}
+            source={{ uri: event.media?.original_url }}
             className="w-full h-72"
             style={styles.heroImage}
           />
@@ -144,7 +143,7 @@ export default function EventDetailsScreen() {
             <View className="flex-row items-center mb-2">
               <Clock size={16} color="#8b5cf6" className="mr-2" />
               <Text className="text-gray-300 font-['Montserrat-Regular']">
-                {formatTime(event.time)}
+              {formatTime(event.time_start)} {' - '} {formatTime(event.time_end)}
               </Text>
             </View>
             
@@ -168,11 +167,15 @@ export default function EventDetailsScreen() {
           <View className="flex-row justify-between items-center">
             <View>
               <Text className="text-gray-400 font-['Montserrat-Regular']">
-                Price
+                Prix
               </Text>
-              <Text className="text-white font-['Montserrat-Bold'] text-2xl">
-                ${event.price.toFixed(2)}
-              </Text>
+
+              {event.prices.map((price, index) => (
+                <Text className="text-white font-['Montserrat-Bold'] text-2xl" key={index}>
+                  {/* ${price.price.toFixed(2)} */}
+                  {`${price.amount.toFixed(2)} ${price.currency.toUpperCase()}`}
+                </Text>
+              ))}
             </View>
             
             <TouchableOpacity

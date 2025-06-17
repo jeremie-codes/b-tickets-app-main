@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { View, Platform } from 'react-native';
-import { Chrome as Home, Search, Ticket, Heart, User } from 'lucide-react-native';
+import { Chrome as Home, Search, Ticket, Heart, User, House } from 'lucide-react-native';
 
 export default function TabsLayout() {
   return (
@@ -21,23 +21,23 @@ export default function TabsLayout() {
         tabBarLabelStyle: {
           fontFamily: 'Montserrat-Medium',
           fontSize: 12,
-          marginTop: -5
+          // marginTop: -5
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Accueil',
           tabBarIcon: ({ color, size }) => (
-            <Home size={size} color={color} />
+            <House size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
-          title: 'Explore',
+          title: 'Découvrir',
           tabBarIcon: ({ color, size }) => (
             <Search size={size} color={color} />
           ),
@@ -46,7 +46,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="tickets"
         options={{
-          title: 'Tickets',
+          title: 'Mes Tickets',
           tabBarIcon: ({ color, size }) => (
             <Ticket size={size} color={color} />
           ),
@@ -55,7 +55,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="favorites"
         options={{
-          title: 'Favorites',
+          title: 'Favories',
           tabBarIcon: ({ color, size }) => (
             <Heart size={size} color={color} />
           ),

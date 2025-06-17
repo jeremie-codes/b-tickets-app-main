@@ -22,7 +22,7 @@ export default function LoginScreen() {
       await login(email, password);
       router.replace('/(app)/(tabs)');
     } catch (error) {
-      showNotification('Identifiants invalides', 'error');
+      showNotification( error?.message , 'error');
     }
   };
 
