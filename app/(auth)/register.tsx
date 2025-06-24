@@ -164,13 +164,12 @@ export default function RegisterScreen() {
             <Text className="text-gray-400 font-['Montserrat-Regular']">
               Avez-vous déjà un compte?{' '}
             </Text>
-            <Link href="/(auth)/login" asChild>
-              <TouchableOpacity>
-                <Text className="text-primary-400 font-['Montserrat-SemiBold']">
-                  Se connecter
-                </Text>
-              </TouchableOpacity>
-            </Link>
+            <TouchableOpacity 
+              onPress={() => router.replace('/(auth)/login')}>
+              <Text className="text-primary-400 font-['Montserrat-SemiBold']">
+                Se connecter
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

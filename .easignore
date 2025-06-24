@@ -1,0 +1,39 @@
+# Node modules (gérés automatiquement par EAS)
+node_modules/
+
+# Dossiers temporaires
+.expo/
+.expo-shared/
+dist/
+build/
+web-build/
+
+# Tests
+__tests__/
+*.test.js
+*.test.ts
+*.test.tsx
+*.spec.js
+*.spec.ts
+*.spec.tsx
+coverage/
+
+# Fichiers de config non nécessaires à la build
+.env
+.env.*
+*.env
+
+# Fichiers personnels ou docs
+README.md
+README.*
+LICENSE
+*.log
+*.md
+docs/
+scripts/
+.vscode/
+.idea/
+*.iml
+
+# Autres
+*.DS_Store

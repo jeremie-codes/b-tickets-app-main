@@ -37,10 +37,10 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#232323",
-          "image": "./assets/images/casque.png",
-          "resizeMode": "cover",
-          "imageWidth": 1080
+          "backgroundColor": "#240233",
+          "image": "./assets/images/logo.png",
+          "resizeMode": "contain",
+          "imageWidht": 200
         }
       ]
     ],
@@ -50,12 +50,15 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "8c9290c9-35c4-4446-9357-4ef56a231d8b"
+        "projectId": "ab24ffc8-d887-43a0-94bd-d000311dcf08"
       }
     },
-    "owner": "jeremie-mianda",
+    "owner": "jey-mianda",
     "android": {
-      "package": "com.jeremiemianda.btickets"
+      "package": "com.jeremiemianda.btickets",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     }
   }
 }
