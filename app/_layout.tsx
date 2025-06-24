@@ -30,9 +30,6 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
-  useEffect(() => {
-    onLayoutRootView();
-  }, [onLayoutRootView]);
 
   if (!fontsLoaded && !fontError) {
     return (
@@ -43,7 +40,8 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView className="flex-1" >
+  <GestureHandlerRootView className="flex-1">
+    <View className="flex-1" onLayout={onLayoutRootView}>
       <AuthProvider>
         <NotificationProvider>
           <Stack screenOptions={{ headerShown: false }}>
@@ -53,6 +51,8 @@ export default function RootLayout() {
           <StatusBar style="light" />
         </NotificationProvider>
       </AuthProvider>
-    </GestureHandlerRootView>
-  );
+    </View>
+  </GestureHandlerRootView>
+);
+
 }

@@ -1,39 +1,41 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { ArrowLeft, Heart, Trash2, ShoppingBag } from 'lucide-react-native';
+import { ArrowLeft, Trash2, ShoppingBag } from 'lucide-react-native';
 import { useNotification } from '@/contexts/NotificationContext';
-import { getWishlist, removeFromWishlist } from '@/services/api';
-import { WishlistItem } from '@/types';
+import { getWishlist, toggleWishlist } from '@/services/api';
+import { EventType, WishlistItem } from '@/types';
 import EventCard from '@/components/EventCard';
 
 export default function WishlistScreen() {
   const { showNotification } = useNotification();
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [removingItems, setRemovingItems] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    loadWishlist();
-  }, []);
+  const [removingItems, setRemovingItems] = useState<Set<number>>(new Set());
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadWishlist = async () => {
     try {
-      const data = await getWishlist();
+      const { data } = await getWishlist();
       setWishlist(data);
     } catch (error) {
       showNotification('Erreur lors du chargement de la wishlist', 'error');
     } finally {
       setIsLoading(false);
+      setRefreshing(false);
     }
   };
 
-  const handleRemoveFromWishlist = (item: WishlistItem) => {
+  useEffect(() => {
+    loadWishlist();
+  }, []);
+
+  const handleRemoveFromWishlist = (item: EventType) => {
     Alert.alert(
       "Supprimer de la Wishlist",
-      `Êtes-vous sûr de vouloir supprimer "${item.event.title}" de votre wishlist ?`,
+      `Êtes-vous sûr de vouloir supprimer "${item.title}" de votre wishlist ?`,
       [
         {
           text: "Annuler",
@@ -48,10 +50,10 @@ export default function WishlistScreen() {
     );
   };
 
-  const confirmRemoveFromWishlist = async (itemId: string) => {
+  const confirmRemoveFromWishlist = async (itemId: number) => {
     setRemovingItems(prev => new Set(prev).add(itemId));
     try {
-      await removeFromWishlist(itemId);
+      await toggleWishlist(itemId, true);
       setWishlist(prev => prev.filter(item => item.id !== itemId));
       showNotification('Supprimé de la wishlist', 'success');
     } catch (error) {
@@ -65,21 +67,21 @@ export default function WishlistScreen() {
     }
   };
 
-  const WishlistItemCard = ({ item }: { item: WishlistItem }) => (
+  const WishlistItemCard = ({ item }: { item: EventType }) => (
     <View className="bg-background-card rounded-xl overflow-hidden mb-4">
-      <EventCard event={item.event} />
+      <EventCard event={item} />
       <View className="p-4 border-t border-gray-700">
         <View className="flex-row justify-between items-center">
           <View>
             <Text className="text-gray-400 font-['Montserrat-Regular'] text-sm">
-              Ajouté le {new Date(item.addedDate).toLocaleDateString('fr-FR')}
+              Ajouté le {new Date(item.created_at).toLocaleDateString('fr-FR')}
             </Text>
           </View>
           <View className="flex-row gap-2">
             <TouchableOpacity
               onPress={() => router.push({
-                pathname: '/(app)/event-details',
-                params: { id: item.event.id }
+                pathname: '/(app)/payment',
+                params: { eventId: item.id }
               })}
               className="bg-primary-600 px-4 py-2 rounded-lg flex-row items-center"
             >
@@ -105,6 +107,11 @@ export default function WishlistScreen() {
     </View>
   );
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadWishlist();
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background-dark">
       <StatusBar style="light" />
@@ -118,7 +125,7 @@ export default function WishlistScreen() {
               <ArrowLeft size={24} color="#fff" />
             </TouchableOpacity>
             <View className="flex-row items-center">
-              <Heart size={24} color="#8b5cf6" fill="#8b5cf6" />
+              <ShoppingBag size={24} color="#8b5cf6" />
               {wishlist.length > 0 && (
                 <View className="bg-primary-600 rounded-full w-6 h-6 items-center justify-center ml-2">
                   <Text className="text-white font-['Montserrat-Bold'] text-xs">
@@ -129,7 +136,7 @@ export default function WishlistScreen() {
             </View>
           </View>
           <Text className="text-white font-['Montserrat-Bold'] text-2xl">
-            Ma Wishlist
+            Ma Liste de Souhait 
           </Text>
           <Text className="text-gray-400 font-['Montserrat-Regular']">
             Événements que vous souhaitez réserver plus tard
@@ -147,6 +154,14 @@ export default function WishlistScreen() {
           <ScrollView 
             className="flex-1 p-6"
             showsVerticalScrollIndicator={false}
+            refreshControl={
+            <RefreshControl 
+              refreshing={refreshing} 
+              onRefresh={onRefresh}
+              tintColor="#8b5cf6"
+              colors={["#8b5cf6"]}
+            />
+          }
           >
             {wishlist.length > 0 ? (
               <>
@@ -157,7 +172,7 @@ export default function WishlistScreen() {
             ) : (
               <View className="flex-1 justify-center items-center py-20">
                 <View className="bg-background-card p-8 rounded-full mb-6">
-                  <Heart size={48} color="#6b7280" />
+                  <ShoppingBag size={48} color="#6b7280" />
                 </View>
                 <Text className="text-white font-['Montserrat-Bold'] text-xl mb-2">
                   Votre wishlist est vide

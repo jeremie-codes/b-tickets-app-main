@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, RefreshControl, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
@@ -55,7 +55,7 @@ export default function HomeScreen() {
         }
       >
         <View className="p-6">
-          <View className="flex-row justify-between items-center mb-8">
+          <View className="flex flex-row justify-between items-center mb-8">
             <View>
               <Text className="text-gray-400 font-['Montserrat-Medium'] text-base">
                 Bienvenue à nouveau,
@@ -63,6 +63,10 @@ export default function HomeScreen() {
               <Text className="text-white font-['Montserrat-Bold'] text-2xl">
                 {user?.name || 'Anonyme'}
               </Text>
+            </View>
+
+            <View className="w-16">
+              <Image source={require('@/assets/images/logo.png')} className="absolue w-full" style={{  height: 40 }} />
             </View>
           </View>
 

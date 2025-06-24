@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { ChevronRight, LogOut, Settings, Ticket, CreditCard, CircleHelp as HelpCircle, Heart } from 'lucide-react-native';
+import { ChevronRight, LogOut, Settings, Ticket, ShoppingBag, CircleHelp as HelpCircle, Heart } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
+import { APP_URL } from '@/configs';
 
 export default function ProfileScreen() {
   const { user, logout, deleteAccount, isLoading } = useAuth();
+  const [picture, setPicture] = useState<string | null>(null);
   const { showNotification } = useNotification();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -19,6 +21,17 @@ export default function ProfileScreen() {
       showNotification('Déconnexion échouée !', 'error');
     }
   };
+
+  useEffect(() => {
+    if (user?.profile?.picture) {
+      const imagePath = user?.profile.picture
+      const relativePath = imagePath?.split('/public/')[1];
+      const imageUrl = `${APP_URL}/${relativePath}`;
+      setPicture(imageUrl);
+    } else {
+      setPicture(null);
+    }
+  }, [])
 
   const confirmDeleteAccount = () => {
     Alert.alert(
@@ -75,9 +88,18 @@ export default function ProfileScreen() {
 
           <View className="items-center mb-8">
             <View className="bg-primary-600 w-24 h-24 rounded-full items-center justify-center mb-4">
-              <Text className="text-white font-['Montserrat-Bold'] text-3xl">
-                {user?.name.charAt(0).toUpperCase()}
-              </Text>
+              {picture ? (
+                  <Image
+                    source={{ uri: picture }}
+                    className='border border-pink-500'
+                    style={{ width: 96, height: 96, borderRadius: 48 }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Text className="text-white font-['Montserrat-Bold'] text-3xl">
+                    {user?.name.charAt(0).toUpperCase() || 'U'}
+                  </Text>
+                )}
             </View>
             <Text className="text-white font-['Montserrat-Bold'] text-xl">
               {user?.name}
@@ -102,7 +124,7 @@ export default function ProfileScreen() {
               onPress={() => router.push('/(app)/(tabs)/tickets')}
             />
             <ProfileOption 
-              icon={<Heart size={22} color="#8b5cf6" />} 
+              icon={<ShoppingBag size={22} color="#8b5cf6" />} 
               title="Wishlist" 
               onPress={() => router.push('/(app)/wishlist')}
             />
@@ -131,7 +153,7 @@ export default function ProfileScreen() {
                 <>
                   <LogOut size={20} color="#8b5cf6" className="mr-2" />
                   <Text className="text-white font-['Montserrat-SemiBold']">
-                    Logout
+                    Deconnexion
                   </Text>
                 </>
               )}
@@ -145,8 +167,8 @@ export default function ProfileScreen() {
               {isDeleting ? (
                 <ActivityIndicator color="#ef4444" />
               ) : (
-                <Text className="text-red-500 font-['Montserrat-SemiBold']">
-                  Delete Account
+                <Text className="text-red-400 font-['Montserrat-SemiBold']">
+                  Supprimer le compte
                 </Text>
               )}
             </TouchableOpacity>

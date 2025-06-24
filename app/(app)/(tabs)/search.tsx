@@ -13,7 +13,7 @@ export default function SearchScreen() {
   const [events, setEvents] = useState<EventType[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<EventType[]>([]);
   const [categories, setCategories] = useState<CategoryType[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -51,13 +51,13 @@ export default function SearchScreen() {
     }
 
     if (selectedCategory) {
-      filtered = filtered.filter(event => event.category === selectedCategory);
+      filtered = filtered.filter(event => event.category_id === selectedCategory);
     }
 
     setFilteredEvents(filtered);
   };
 
-  const selectCategory = (categoryId: string) => {
+  const selectCategory = (categoryId: number) => {
     if (selectedCategory === categoryId) {
       setSelectedCategory(null);
     } else {
@@ -67,7 +67,7 @@ export default function SearchScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-dark">
-      <View className="p-6 flex-1">
+      <View className="p-6 flex-">
         <Text className="text-white font-['Montserrat-Bold'] text-2xl mb-6">
           Découvrir les événements
         </Text>
@@ -88,12 +88,12 @@ export default function SearchScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 16 }}
-          className="mb-4"
+          contentContainerStyle={{ paddingBottom: 0 }}
+          className="pb-6"
         >
-          {categories.map(category => (
+          {categories.map((category, index) => (
             <TouchableOpacity
-              key={category.id}
+              key={index}
               onPress={() => selectCategory(category.id)}
               className={`px-4 py-2 h-9 rounded-full mr-3 ${
                 selectedCategory === category.id ? 'bg-primary-600' : 'bg-background-card'

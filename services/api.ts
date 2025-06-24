@@ -1,9 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, EventType, TicketType, CategoryType, WishlistItem } from '@/types';
-
-// In a real app, this would be an environment variable
-const API_URL = 'https://testv2.b-tickets-app.com/api';
+import { User, EventType, ProfileType, CategoryType, WishlistItem } from '@/types';
+import { API_URL } from '@/configs/index';
 
 // For demo purposes, we're simulating API calls
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -90,52 +88,6 @@ const mockEvents: EventType[] = [
   }
 ];
 
-const mockCategories: CategoryType[] = [
-  { id: '1', name: 'Music' },
-  { id: '2', name: 'Technology' },
-  { id: '3', name: 'Food & Drink' },
-  { id: '4', name: 'Art & Culture' },
-  { id: '5', name: 'Sports' },
-  { id: '6', name: 'Entertainment' }
-];
-
-const mockTickets: TicketType[] = [
-  {
-    id: 'ticket1',
-    event: mockEvents[0],
-    status: 'active',
-    purchaseDate: '2025-05-10',
-    qrCode: 'https://example.com/qr/ticket1'
-  },
-  {
-    id: 'ticket2',
-    event: mockEvents[2],
-    status: 'used',
-    purchaseDate: '2025-04-15',
-    qrCode: 'https://example.com/qr/ticket2'
-  },
-  {
-    id: 'ticket3',
-    event: mockEvents[4],
-    status: 'expired',
-    purchaseDate: '2024-12-20',
-    qrCode: 'https://example.com/qr/ticket3'
-  }
-];
-
-const mockWishlist: WishlistItem[] = [
-  {
-    id: 'wish1',
-    event: mockEvents[1],
-    addedDate: '2025-01-10'
-  },
-  {
-    id: 'wish2',
-    event: mockEvents[3],
-    addedDate: '2025-01-08'
-  }
-];
-
 // Auth functions
 export const login = async (email: string, password: string) => {
   try {
@@ -147,6 +99,8 @@ export const login = async (email: string, password: string) => {
 
     const { token, user } = response.data.data;
 
+    console.log(user.id);
+    
     //Stocke le token
     // await AsyncStorage.setItem('@b_ticket_token', token);
 
@@ -200,23 +154,64 @@ export const logout = async (token: string) => {
 };
 
 // User profile functions
-export const updateUserProfile = async (userData: { name: string; email: string; profileImage?: string }) => {
-  await delay(1500); // Simulate API delay
-  // In a real app, this would be a PUT request to the API
-  return {
-    success: true,
-    user: {
-      id: '1',
-      ...userData
-    }
-  };
+// export const updateUserProfile = async (userData: { name: string; email: string; profileImage?: string }) => {
+export const updateUserProfile = async (userData: { name: string; first_name: string; last_name: any, email: string }) => {
+  
+  try {
+    const response = await axios.post(`${API_URL}/profile`, userData);
+    // console.log(response.data)
+    const { success, data } = response.data;
+   
+    const profileData = data[0];
+    const userResponse = data[1];
+
+    const profile: ProfileType = {
+      id: profileData.id.toString(),
+      name: profileData.name,
+      first_name: profileData.first_name,
+      last_name: profileData.last_name,
+      email: userResponse.email,
+      picture: profileData.picture,
+    };
+
+    const userResp: User = {
+      id: userResponse.id.toString(),
+      name: userResponse.name,
+      email: userResponse.email,
+      profile,
+    };
+    await AsyncStorage.setItem('@b_ticket_user', JSON.stringify(userResp));
+
+    return { success, userResp };
+  } catch (error: any) {
+    console.log(error.response?.data || 'Profile update failed');
+    throw error;
+  }
 };
 
-export const uploadProfileImage = async (base64Image: string) => {
-  await delay(2000);
-  // In real app, this would upload to your Laravel backend
-  const imageUrl = `https://api.bticket.example.com/uploads/profile_${Date.now()}.jpg`;
-  return { success: true, imageUrl };
+// export const uploadProfileImage = async (base64Image: string) => {
+//   try {
+//     const response = await axios.post(`${API_URL}/user/upload-profile-image`, {
+//       image: base64Image
+//     });
+//     const { success, imageUrl } = response.data;
+//     return { success, imageUrl };
+//   } catch (error: any) {
+//     console.log(error.response?.data?.message || 'Image upload failed');
+//     throw error;
+//   }
+// };
+
+export const uploadProfileImage = async (formData: FormData) => {
+  try {
+    const response = await axios.post(`${API_URL}/profile/picture`,formData);
+    const { success, data } = response.data;
+
+    return { success, data };
+  } catch (error: any) {
+    console.error('Erreur lors de l\'upload', error.response || error.message);
+    return { success: false, message: 'Erreur lors de l\'upload de l\'image' };
+  }
 };
 
 export const deleteAccount = async (token: string) => {
@@ -291,10 +286,8 @@ export const getFavorites = async () => {
 
     const response = await axios.get(`${API_URL}/favorites/list`);
     const { data } = response.data;
-    
-    // console.log(data)
-    
-    return data;
+
+    return data.data;
   } catch (error: any) {
     console.log(error.response?.data?.message || 'Loading failed');
   }
@@ -323,61 +316,45 @@ export const toggleFavorite = async (eventId: number, isFavorite: boolean) => {
 
 // Wishlist functions
 export const getWishlist = async () => {
-  await delay(1000); // Simulate API delay
-  // In a real app, this would be a GET request to the API
-  return mockWishlist;
+    try {
+
+    const response = await axios.get(`${API_URL}/wishlist/events`);
+
+    const { data } = response.data;
+
+    return data;
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Register failed');
+  }
 };
 
-export const addToWishlist = async (eventId: string) => {
-  await delay(800); // Simulate API delay
-  // In a real app, this would be a POST request to the API
-  const event = mockEvents.find(e => e.id === eventId);
-  if (!event) {
-    throw new Error('Event not found');
-  }
-  
-  const wishlistItem: WishlistItem = {
-    id: `wish${Date.now()}`,
-    event,
-    addedDate: new Date().toISOString().split('T')[0]
-  };
-  
-  mockWishlist.push(wishlistItem);
-  return { success: true, item: wishlistItem };
-};
+export const toggleWishlist = async (eventId: number, isWishlist: boolean) => {
+  try {
+    let response;
 
-export const removeFromWishlist = async (wishlistItemId: string) => {
-  await delay(600); // Simulate API delay
-  // In a real app, this would be a DELETE request to the API
-  const index = mockWishlist.findIndex(item => item.id === wishlistItemId);
-  if (index > -1) {
-    mockWishlist.splice(index, 1);
-    return { success: true };
+    if (isWishlist) {
+      response = await axios.post(`${API_URL}/wishlist/remove/${eventId}`);
+        const { event } = response.data.data;
+        return { isWishlist: false }; 
+    }
+
+    response = await axios.post(`${API_URL}/wishlist/add/${eventId}`);
+    const { event } = response.data.data;
+    return { isWishlist: true };   
+
+  } catch (error: any) {
+    console.log(error.response?.data?.message || 'Loading failed');
+    throw new Error('Evénement non trouvé');
   }
-  throw new Error('Wishlist item not found');
 };
 
 // Categories functions
 export const getCategories = async () => {
-  // await delay(800); // Simulate API delay
-  // In a real app, this would be a GET request to the API
-  // return mockCategories;
 
   try {
 
-    const response = await axios.get(`${API_URL}/event/recents`);
-    const { recentEvents } = response.data;
-    
-    const categories : CategoryType[] = [];
-
-    recentEvents.forEach((el: any) => {
-      if (!categories.includes(el.category)) {
-        categories.push(el.category);
-      }
-    });
-    
-    console.log(categories)
-
+    const response = await axios.get(`${API_URL}/categories`);
+    const { categories } = response.data;
     
     return categories;
   } catch (error: any) {
@@ -391,10 +368,8 @@ export const getUserTickets = async () => {
 
     const response = await axios.get(`${API_URL}/tickets`);
     const { data } = response.data;
-    
-    // console.log(data)
-    
-    return data;
+        
+    return data.data;
   } catch (error: any) {
     console.log(error.response?.data?.message || 'Loading failed');
   }
@@ -416,12 +391,29 @@ export const getTicketById = async (id: string) => {
 
 // Payment function
 export const processPayment = async (paymentData: any) => {
-  await delay(2000); // Simulate API delay
-  // In a real app, this would be a POST request to the API
-  return { 
-    success: true, 
-    ticketId: 'ticket1' // Return the first mock ticket for demo purposes
-  };
+  // console.log(paymentData)
+  try {
+    const response = await axios.post(`${API_URL}/payTicket`, paymentData);
+    const { data } = response;
+    return { success: data.success, data };
+  } catch (error: any) {
+    console.log(error.response?.data || 'Payment failed');
+    throw error;
+  }
+};
+
+// Payment function
+export const getPayToken = async () => {
+  // console.log(paymentData)
+  try {
+    const response = await axios.get(`${API_URL}/token`);
+    const { success, token } = response.data.data;
+    // console.log(token)
+    return { success, token };
+  } catch (error: any) {
+    console.log(error.response?.data || 'Get token Pay failed');
+    throw error;
+  }
 };
 
 // Set up axios interceptors for adding token to requests
@@ -431,6 +423,7 @@ export const setupApiInterceptors = async () => {
       const token = await AsyncStorage.getItem('@b_ticket_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+        config.headers['Content-Type'] = 'multipart/form-data'
       }
       return config;
     },

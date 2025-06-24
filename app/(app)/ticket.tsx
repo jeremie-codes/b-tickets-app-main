@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Image } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -9,10 +9,11 @@ import { getTicketById } from '@/services/api';
 import { TicketType } from '@/types';
 import { useNotification } from '@/contexts/NotificationContext';
 import { formatDate, formatTime } from '@/utils/formatters';
+import { APP_URL } from '@/configs';
 
 export default function TicketScreen() {
   const { ticketId } = useLocalSearchParams<{ ticketId: string }>();
-  // const ticketId = '12';
+  const [state, setState] = useState<string>('')
   const { showNotification } = useNotification();
   const [ticket, setTicket] = useState<TicketType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,14 +36,40 @@ export default function TicketScreen() {
     loadTicket();
   }, [ticketId]);
 
+  useEffect(() => {
+
+    if (ticket) {
+      // const verifyExpire = () => {
+      //   const now = new Date();
+      //   const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      //   const eventDate = new Date(ticket.event.date);
+      //   const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+
+      //   return eventDateOnly < nowDateOnly;
+      // }
+
+      if (ticket?.used_at === null && ticket.success === 1) {
+        setState('active');
+      } else if ( ticket.success === null) {
+        setState('en attente');
+      } else if (ticket.success === 0) {
+        setState('échoué');
+      } else if (ticket.used_at !== null) {
+        setState('utilisé');
+      } 
+    }
+    
+  }, [ticket])
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
         return 'text-green-500';
-      case 'used':
+      case 'utilisé':
         return 'text-gray-400';
-      case 'expired':
-        return 'text-red-500';
+      case 'en attente':
+        return 'text-yellow-500';
       default:
         return 'text-gray-400';
     }
@@ -97,12 +124,9 @@ export default function TicketScreen() {
               <View className="flex-row justify-between items-center mb-4">
                 <Text className="text-white font-['Montserrat-Bold'] text-xl">
                   {ticket.event.title}
-                  {/* Concert Humanitaire  */}
                 </Text>
-                <Text className={`font-['Montserrat-SemiBold'] ${getStatusColor(ticket.status)}`}>
-                {/* <Text className={`font-['Montserrat-SemiBold'] text-green-400`}> */}
-                  {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
-                  {/* Non utiliser */}
+                <Text className={`font-['Montserrat-SemiBold'] ${getStatusColor(state)}`}>
+                  {state.charAt(0).toUpperCase() + state.slice(1)}
                 </Text>
               </View>
               
@@ -117,7 +141,7 @@ export default function TicketScreen() {
               <View className="flex-row items-center mb-2">
                 <Clock size={16} color="#8b5cf6" className="mr-2" />
                 <Text className="text-gray-300 font-['Montserrat-Regular']">
-                  {formatTime(ticket.event.time)} 
+                  {formatTime(ticket.event.time_start)} {' - '} {formatTime(ticket.event.time_end)}
                   {/* 10:00 AM */}
                 </Text>
               </View>
@@ -131,31 +155,31 @@ export default function TicketScreen() {
               </View>
             </View>
             
-            <View className="items-center p-6 bg-background-elevated">
+            {ticket.qrcode && <View className="items-center p-6 bg-background-elevated">
               <Text className="text-gray-400 font-['Montserrat-Medium'] mb-4 text-center">
                 Présentez ce code QR à l'entrée de l'événement
               </Text>
               
-              <View className="bg-white p-4 rounded-lg mb-4">
+              <View className="bg-white p-2 rounded-lg mb-4 h-72 w-72 flex items-center justify-center">
+                <Image source={{ uri: `${APP_URL}/${ticket.qrcode}` }} className='w-full h-full' />
                 {/* <QRCode
-                  value={"numero ticket"}
+                  value={`${APP_URL}/ticket/${ticket.id}`}
                   size={200}
                   color="#000"
                   backgroundColor="#fff"
                 /> */}
-                <QRCode
-                  value={ticket.qrCode}
-                  size={200}
-                  color="#000"
-                  backgroundColor="#fff"
-                />
               </View>
               
               <Text className="text-gray-300 font-['Montserrat-SemiBold'] text-center">
                 Ticket ID: {ticket.id} 
-                {/* 123456789 */}
               </Text>
-            </View>
+            </View>}
+            
+            {!ticket.qrcode && <View className="items-center p-6 bg-background-elevated">
+              <Text className="text-gray-400 font-['Montserrat-Medium'] mb-4 text-center">
+                Pas de QrCode disponible pour ce ticket. {`\n`} si la transaction est réussie, le QrCode sera généré.
+              </Text>
+            </View>}
           </View>
 
           <View className="flex-row gap-4">
@@ -171,7 +195,7 @@ export default function TicketScreen() {
             
             <TouchableOpacity 
               className="flex-1 bg-primary-600 py-4 rounded-xl flex-row items-center justify-center"
-              // onPress={() => showNotification('Download functionality is not available in this demo', 'info')}
+              onPress={() => showNotification('Download functionality is not available in this demo', 'info')}
             >
               <Download size={20} color="#fff" className="mr-2" />
               <Text className="text-white font-['Montserrat-SemiBold']">

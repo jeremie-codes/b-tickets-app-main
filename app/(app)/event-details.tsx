@@ -3,8 +3,8 @@ import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Sty
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { ArrowLeft, Calendar, Clock, MapPin, Heart } from 'lucide-react-native';
-import { getEventById, toggleFavorite } from '@/services/api';
+import { ArrowLeft, Calendar, Clock, MapPin, Heart, ShoppingBag } from 'lucide-react-native';
+import { getEventById, toggleFavorite, toggleWishlist } from '@/services/api';
 import { EventType } from '@/types';
 import { useNotification } from '@/contexts/NotificationContext';
 import { formatDate, formatTime } from '@/utils/formatters';
@@ -15,7 +15,9 @@ export default function EventDetailsScreen() {
   const [event, setEvent] = useState<EventType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isWishList, setIsWishList] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+  const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
 
   useEffect(() => {
     const loadEvent = async () => {
@@ -25,6 +27,7 @@ export default function EventDetailsScreen() {
         const data = await getEventById(id);
         setEvent(data);
         setIsFavorite(data.is_favorite);
+        setIsWishList(data.is_wishlist);
       } catch (error) {
         showNotification('Erreur de chargement de l\'evénément !', 'error');
       } finally {
@@ -50,6 +53,24 @@ export default function EventDetailsScreen() {
       showNotification('Error de mise à jour des favoris', 'error');
     } finally {
       setIsTogglingFavorite(false);
+    }
+  };
+
+  const handleToggleWishList = async () => {
+    if (!event) return;
+    
+    setIsTogglingWishlist(true);
+    try {
+      const result = await toggleWishlist(event.id, isWishList);
+      setIsWishList(result.isWishlist);
+      showNotification(
+        result.isWishlist ? 'Évenément ajouté dans la list de souhait' : 'Évenément supprimer dans la list de souhait',
+        'success'
+      );
+    } catch (error) {
+      showNotification('Error de mise à jour des souhaits', 'error');
+    } finally {
+      setIsTogglingWishlist(false);
     }
   };
 
@@ -90,12 +111,16 @@ export default function EventDetailsScreen() {
 
   return (
     <View className="flex-1 bg-background-dark">
+    <ScrollView 
+      showsVerticalScrollIndicator={false} 
+      contentContainerStyle={{ paddingBottom: 32 }}
+      >
       <StatusBar style="light" />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View>
+        <View >
           <Image
-            source={{ uri: event.media?.original_url }}
-            className="w-full h-72"
+            source={{ uri: event.media[0].original_url }}
+            className="w-full"
+            resizeMode='cover'
             style={styles.heroImage}
           />
           
@@ -108,21 +133,39 @@ export default function EventDetailsScreen() {
                 <ArrowLeft size={24} color="#fff" />
               </TouchableOpacity>
               
-              <TouchableOpacity 
-                onPress={handleToggleFavorite}
-                disabled={isTogglingFavorite}
-                className="p-2 rounded-full bg-black/30 backdrop-blur-md"
-              >
-                {isTogglingFavorite ? (
-                  <ActivityIndicator size="small" color="#8b5cf6" />
-                ) : (
-                  <Heart 
-                    size={24} 
-                    color={isFavorite ? "#8b5cf6" : "#fff"} 
-                    fill={isFavorite ? "#8b5cf6" : "transparent"} 
-                  />
-                )}
-              </TouchableOpacity>
+              <View className='flex flex-row items-center gap-4'>
+                <TouchableOpacity 
+                  onPress={handleToggleWishList}
+                  disabled={isTogglingWishlist}
+                  className="p-2 rounded-full bg-black/30 backdrop-blur-md"
+                >
+                  {isTogglingWishlist ? (
+                    <ActivityIndicator size="small" color="#8b5cf6" />
+                  ) : (
+                    <ShoppingBag 
+                      size={24} 
+                      color={isWishList ? "rgb(246, 203, 86)" : "#fff"} 
+                      fill={isWishList ? "rgb(190, 141, 6)" : "transparent"} 
+                    />
+                  )}
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  onPress={handleToggleFavorite}
+                  disabled={isTogglingFavorite}
+                  className="p-2 rounded-full bg-black/30 backdrop-blur-md"
+                >
+                  {isTogglingFavorite ? (
+                    <ActivityIndicator size="small" color="#8b5cf6" />
+                  ) : (
+                    <Heart 
+                      size={24} 
+                      color={isFavorite ? "rgb(255, 43, 43)" : "#fff"} 
+                      fill={isFavorite ? "rgb(255, 43, 43)" : "transparent"} 
+                    />
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
           </SafeAreaView>
         </View>
@@ -153,6 +196,31 @@ export default function EventDetailsScreen() {
                 {event.location}
               </Text>
             </View>
+            
+            <View className="flex-row items-center gap-4">
+              {event.author_picture ? (
+                  <Image
+                    source={{ uri: event.author_picture }}
+                    style={{ width: 96, height: 96, borderRadius: 48 }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View className="bg-primary-600 w-12 h-12 rounded-full items-center justify-center mt-3">
+                    <Text className="text-white font-['Montserrat-Bold'] text-3xl">
+                      {event.author_name.charAt(0).toUpperCase() || 'A'}
+                    </Text>
+                  </View>
+                )}
+
+                <View className="justify-center mt-3">
+                  <Text className="text-white font-['Montserrat-Medium'] text-lg">
+                    {event.author_name}
+                  </Text>
+                  <Text className="text-gray-400 font-['Montserrat-Regular'] text-md">
+                    Organisateur
+                  </Text>
+                </View>
+            </View>
           </View>
           
           <View className="mb-6">
@@ -164,27 +232,41 @@ export default function EventDetailsScreen() {
             </Text>
           </View>
           
-          <View className="flex-row justify-between items-center">
+          <View className="flex-col justify-between">
             <View>
-              <Text className="text-gray-400 font-['Montserrat-Regular']">
-                Prix
+              <Text className="text-gray-400 font-['Montserrat-Bold'] text-md">
+                Prix de billet
               </Text>
 
               {event.prices.map((price, index) => (
-                <Text className="text-white font-['Montserrat-Bold'] text-2xl" key={index}>
-                  {/* ${price.price.toFixed(2)} */}
-                  {`${price.amount.toFixed(2)} ${price.currency.toUpperCase()}`}
-                </Text>
+                  <View
+                    key={index}
+                    className={`p-4 rounded-xl borde bg-background-card border-gray-700 mt-1`}
+                  >
+                    <View className="flex-row justify-between items-center">
+                      <View>
+                        <Text className="text-white font-['Montserrat-SemiBold'] text-base">
+                          {price.category.charAt(0).toUpperCase() + price.category.slice(1)}
+                        </Text>
+                        <Text className="text-gray-400 font-['Montserrat-Regular'] text-sm">
+                          Billet {price.category}
+                        </Text>
+                      </View>
+                      <Text className="text-white font-['Montserrat-Bold'] text-lg">
+                        {price.amount.toFixed(2)} {price.currency.toUpperCase()}
+                      </Text>
+                    </View>
+                  </View>
               ))}
             </View>
             
             <TouchableOpacity
               onPress={handleBookTicket}
-              className="bg-primary-600 px-8 py-4 rounded-xl"
+              className="bg-primary-600 px-8 py-4 rounded-xl mt-3"
               activeOpacity={0.8}
             >
-              <Text className="text-white font-['Montserrat-SemiBold'] text-base">
-                Réserver le Ticket
+              <Text className="text-white font-['Montserrat-SemiBold'] text-base text-center">
+                Réserver Le Billet
               </Text>
             </TouchableOpacity>
           </View>
@@ -197,6 +279,7 @@ export default function EventDetailsScreen() {
 const styles = StyleSheet.create({
   heroImage: {
     resizeMode: 'cover',
+    height: 450
   },
   eventCard: {
     shadowColor: '#000',

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
-import { Calendar, MapPin, Heart, User, Plus, Ticket } from 'lucide-react-native';
+import { Calendar, MapPin, Heart, User, ShoppingBag, Ticket } from 'lucide-react-native';
 import { EventType } from '@/types';
 import { toggleFavorite } from '@/services/api';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -13,13 +13,8 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event, featured = false }: EventCardProps) {
-  const { showNotification } = useNotification();
-  // const [isFavorite, setIsFavorite] = useState(event.isFavorite);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
 
   const handlePress = () => {
-    // console.log(event.id)
     router.push({
       pathname: '/(app)/event-details',
       params: { id: event.id }
@@ -30,24 +25,6 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
     price => price.category.toLowerCase() === 'standard'
   );
 
-  const handleToggleFavorite = async (e: any) => {
-    e.stopPropagation();
-    
-    setIsTogglingFavorite(true);
-    try {
-      const result = await toggleFavorite(event.id);
-      setIsFavorite(result.isFavorite);
-      showNotification(
-        result.isFavorite ? 'Ajouté dans favoris' : 'Supprimer dans favoris',
-        'success'
-      );
-    } catch (error) {
-      showNotification('Error de mise à jour vers favoris', 'error');
-    } finally {
-      setIsTogglingFavorite(false);
-    }
-  };
-
   if (featured) {
     return (
       <TouchableOpacity 
@@ -57,28 +34,10 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
         style={styles.card}
       >
         <Image
-        source={{ uri: event.media.original_url }}
+        source={{ uri: event.media[0].original_url }}
           className="w-full h-40"
           style={{ resizeMode: 'cover' }}
         />
-        
-        <View className="absolute top-2 right-2">
-          <TouchableOpacity 
-            // onPress={handleToggleFavorite}
-            disabled={isTogglingFavorite}
-            className="p-2 rounded-full bg-black/30 backdrop-blur-md"
-          >
-            {isTogglingFavorite ? (
-              <ActivityIndicator size="small" color="#8b5cf6" />
-            ) : (
-              <Plus 
-                size={18} 
-                color={isFavorite ? "#8b5cf6" : "#fff"} 
-                fill={isFavorite ? "#8b5cf6" : "transparent"} 
-              />
-            )}
-          </TouchableOpacity>
-        </View>
         
         <View className="p-4 bg-background-card">
           <Text className="text-white font-['Montserrat-Bold'] text-lg mb-2">
@@ -88,7 +47,7 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
           <View className="flex-row items-center mb-2">
             <Calendar size={14} color="#8b5cf6" className="mr-2" />
             <Text className="text-gray-300 font-['Montserrat-Regular'] text-sm">
-              {formatDate(event.date)} {'  '}
+              {/* {formatDate(event.date)} {'  '} */}
             </Text>
   
             <MapPin size={14} color="#8b5cf6" className="mr-2" />
@@ -117,7 +76,7 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
       style={styles.card}
     >
       <Image
-        source={{ uri: event.media.original_url }}
+        source={{ uri: event.media[0].original_url }}
         className="w-24"
         style={{ resizeMode: 'cover' }}
       />
@@ -127,21 +86,6 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
           <Text className="text-white font-['Montserrat-Bold'] text-base mb-1 flex-1 pr-6">
             {event.title}
           </Text>
-          
-          <TouchableOpacity 
-            // onPress={handleToggleFavorite}
-            disabled={isTogglingFavorite}
-          >
-            {isTogglingFavorite ? (
-              <ActivityIndicator size="small" color="#8b5cf6" />
-            ) : (
-              <Plus 
-                size={18} 
-                color={isFavorite ? "#8b5cf6" : "#9ca3af"} 
-                fill={isFavorite ? "#8b5cf6" : "transparent"} 
-              />
-            )}
-          </TouchableOpacity>
         </View>
         
         <View className="flex-row items-center mb-1">

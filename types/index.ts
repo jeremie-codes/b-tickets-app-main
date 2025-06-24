@@ -1,11 +1,19 @@
-export interface User {
+export interface ProfileType {
   id: string;
   name: string;
+  first_name: string;
+  last_name: string;
   email: string;
+  picture: string;
   profileImage?: string;
 }
 
-// types/EventType.ts
+export interface User {
+  id: any;
+  name: string;
+  profile: ProfileType;
+  email: string;
+}
 
 export interface CategoryType {
   id: number;
@@ -74,12 +82,33 @@ export interface EventType {
   deleted_at: string | null;
 }
 
+// export interface TicketType {
+//   id: string;
+//   event: EventType;
+//   status: 'active' | 'used' | 'expired';
+//   purchaseDate: string;
+//   qrCode: string;
+// }
+
 export interface TicketType {
-  id: string;
+  id: number;
+  reference: string;
+  quantity: number;
+  total_amount: number;
+  unit_amount: number;
+  currency: string;
+  payment_method: string;
+  type_ticket: string;
+  qrcode: string;
+  is_refunded: number;
+  scanned_by: string | null;
+  used_at: string | null;
+  success: number;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
   event: EventType;
-  status: 'active' | 'used' | 'expired';
-  purchaseDate: string;
-  qrCode: string;
+  tickets: any[]; // Remplace par une structure précise si disponible
 }
 
 export interface PaymentMethod {
@@ -90,7 +119,7 @@ export interface PaymentMethod {
 }
 
 export interface WishlistItem {
-  id: string;
+  id: number;
   event: EventType;
-  addedDate: string;
+  created_at: string;
 }

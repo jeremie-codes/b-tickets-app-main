@@ -17,19 +17,11 @@ import {
 
 export default function HelpSupportScreen() {
   const handleEmailSupport = () => {
-    Linking.openURL('mailto:support@bticket.com?subject=Support Request');
+    Linking.openURL('mailto:contact@balezi-group.com?subject=Support Request');
   };
 
   const handlePhoneSupport = () => {
     Linking.openURL('tel:+1234567890');
-  };
-
-  const handleLiveChat = () => {
-    Alert.alert(
-      "Chat en Direct",
-      "Le chat en direct sera disponible prochainement. En attendant, vous pouvez nous contacter par email ou téléphone.",
-      [{ text: "OK" }]
-    );
   };
 
   const handleExternalLink = (url: string) => {
@@ -128,7 +120,7 @@ export default function HelpSupportScreen() {
             <ContactOption
               icon={<Mail size={22} color="#8b5cf6" />}
               title="Email Support"
-              subtitle="support@bticket.com"
+              subtitle="contact@balezi-group.com"
               onPress={handleEmailSupport}
             />
             
@@ -138,13 +130,7 @@ export default function HelpSupportScreen() {
               subtitle="Lun-Ven, 9h-18h"
               onPress={handlePhoneSupport}
             />
-            
-            <ContactOption
-              icon={<MessageCircle size={22} color="#8b5cf6" />}
-              title="Chat en Direct"
-              subtitle="Réponse immédiate"
-              onPress={handleLiveChat}
-            />
+
           </View>
 
           {/* FAQ Section */}
@@ -153,10 +139,10 @@ export default function HelpSupportScreen() {
               Questions Fréquentes
             </Text>
             
-            <FAQItem
+            {/* <FAQItem
               question="Comment puis-je annuler mon billet ?"
               answer="Vous pouvez annuler votre billet jusqu'à 24h avant l'événement depuis la section 'Mes Tickets'. Les remboursements sont traités sous 3-5 jours ouvrables."
-            />
+            /> */}
             
             <FAQItem
               question="Que faire si je ne reçois pas mon billet ?"
@@ -164,8 +150,8 @@ export default function HelpSupportScreen() {
             />
             
             <FAQItem
-              question="Puis-je transférer mon billet à quelqu'un d'autre ?"
-              answer="Oui, vous pouvez transférer votre billet via l'option 'Partager' dans les détails du billet. Le destinataire recevra un nouveau QR code."
+              question="Comment vais-je faire pour acceéder à l'événement ?"
+              answer="Après l'achat de votre billet, vous aurez dans les details du ticket dans la page mes tickets un nouveau QR code que vous allez présenté à l'entré."
             />
             
             <FAQItem
@@ -175,7 +161,7 @@ export default function HelpSupportScreen() {
           </View>
 
           {/* Resources */}
-          <View className="mb-8">
+          {/* <View className="mb-8">
             <Text className="text-white font-['Montserrat-Bold'] text-lg mb-4">
               Ressources
             </Text>
@@ -197,7 +183,7 @@ export default function HelpSupportScreen() {
               title="Conditions d'Utilisation"
               onPress={() => handleExternalLink('https://bticket.com/terms')}
             />
-          </View>
+          </View> */}
 
           {/* App Info */}
           <View className="bg-background-card rounded-xl p-5">
@@ -244,7 +230,7 @@ export default function HelpSupportScreen() {
               </Text>
             </View>
             <Text className="text-red-300 font-['Montserrat-Regular'] text-sm">
-              Pour les urgences liées aux événements, contactez directement l'organisateur ou les services d'urgence locaux.
+              Pour les urgences liées aux événements, contactez-nous directement ou les services d'urgence sur place.
             </Text>
           </View>
         </View>

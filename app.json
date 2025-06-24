@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "B-ticket",
-    "slug": "b-ticket",
+    "name": "B-tickets",
+    "slug": "b-tickets",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon-app.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,15 +15,17 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/logo.png"
     },
     "plugins": [
       "expo-router",
       "expo-web-browser",
       [
-        "expo-font", 
+        "expo-font",
         {
-          "fonts": ["node_modules/@expo-google-fonts/montserrat/400Regular/Montserrat_400Regular.ttf"]
+          "fonts": [
+            "node_modules/@expo-google-fonts/montserrat/400Regular/Montserrat_400Regular.ttf"
+          ]
         }
       ],
       [
@@ -31,10 +33,29 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#232323",
+          "image": "./assets/images/casque.png",
+          "resizeMode": "cover",
+          "imageWidth": 1080
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8c9290c9-35c4-4446-9357-4ef56a231d8b"
+      }
+    },
+    "owner": "jeremie-mianda",
+    "android": {
+      "package": "com.jeremiemianda.btickets"
     }
   }
 }

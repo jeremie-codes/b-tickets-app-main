@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { login as apiLogin, register as apiRegister, logout as apiLogout, deleteAccount as apiDeleteAccount } from '@/services/api';
-import { User } from '@/types';
+import { updateUserProfile, uploadProfileImage, login as apiLogin, register as apiRegister, logout as apiLogout, deleteAccount as apiDeleteAccount } from '@/services/api';
+import { User, ProfileType } from '@/types';
 
 interface AuthContextType {
   user: User | null;
@@ -9,7 +9,9 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  updateUser: (userDatas: { name: string; first_name: string; last_name: any, email: string }) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<void>;
+  updatePicture: (formData: FormData) => Promise<any>;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
 }
@@ -68,6 +70,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userData);
       setToken(authToken);
       await storeUserAndToken(userData, authToken);
+    } catch (error) {
+      console.error('Connexion échouée !', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateUser = async (userDatas: { name: string; first_name: string; last_name: any, email: string }) => {
+    setIsLoading(true);
+    try {
+      const { success, userResp } = await updateUserProfile(userDatas);
+      
+      await AsyncStorage.setItem('@b_ticket_user', JSON.stringify(userResp));
+
+      setUser(userResp);
+      
+      return success;
+    } catch (error) {
+      console.error('Connexion échouée !', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updatePicture = async (formData: FormData) => {
+    setIsLoading(true);
+    try {
+      const { success, data } = await uploadProfileImage(formData);
+      
+      const users = user;
+      users.profile = data
+            
+      await AsyncStorage.setItem('@b_ticket_user', JSON.stringify(users));
+      setUser(users);
+      
+      return success;
     } catch (error) {
       console.error('Connexion échouée !', error);
       throw error;
@@ -135,6 +175,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         isLoading: isLoading || isLoadingInitial,
         login,
+        updateUser,
+        updatePicture,
         register,
         logout,
         deleteAccount,
