@@ -1,49 +1,40 @@
 {
   "expo": {
-    "name": "B-tickets",
+    "name": "B-TICKETS",
     "slug": "b-tickets",
-    "version": "1.0.0",
+    "version": "0.1.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon-app.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/casque.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#240233"
     },
-    "jsEngine": "jsc",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "",
+      "buildNumber": "4"
+    },
+    "android": {
+      "versionCode": 3,
+      "package": "com.jeremiemianda.btickets",
+      "permissions": [
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon-app.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
     "web": {
-      "bundler": "metro",
-      "output": "single",
       "favicon": "./assets/images/logo.png"
     },
-    "plugins": [
-      "expo-router",
-      "expo-web-browser",
-      [
-        "expo-font",
-        {
-          "fonts": [
-            "node_modules/@expo-google-fonts/montserrat/400Regular/Montserrat_400Regular.ttf"
-          ]
-        }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
-        }
-      ],
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#240233",
-          "image": "./assets/images/logo.png",
-          "resizeMode": "contain",
-          "imageWidht": 200
-        }
-      ]
-    ],
+    "description": "Un groupe qui œuvre dans le Marketing digital et vente de billets",
     "experiments": {
       "typedRoutes": true
     },
@@ -53,12 +44,6 @@
         "projectId": "ab24ffc8-d887-43a0-94bd-d000311dcf08"
       }
     },
-    "owner": "jey-mianda",
-    "android": {
-      "package": "com.jeremiemianda.btickets",
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
-    }
+    "owner": "jey-mianda"
   }
 }
