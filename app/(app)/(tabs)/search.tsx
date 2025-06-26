@@ -23,9 +23,10 @@ export default function SearchScreen() {
           getEvents(),
           getCategories()
         ]);
-        setEvents(eventsData);
-        setFilteredEvents(eventsData);
-        setCategories(categoriesData);
+        setEvents(Array.isArray(eventsData) ? eventsData : []);
+        setFilteredEvents(Array.isArray(eventsData) ? eventsData : []);
+
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
       } catch (error) {
         showNotification('Chargement des données échoué !', 'error');
       } finally {
@@ -91,7 +92,7 @@ export default function SearchScreen() {
           contentContainerStyle={{ paddingBottom: 0 }}
           className="pb-6"
         >
-          {categories.map((category, index) => (
+          {Array.isArray(categories) && categories.length > 0 && categories.map((category, index) => (
             <TouchableOpacity
               key={index}
               onPress={() => selectCategory(category.id)}
@@ -128,10 +129,10 @@ export default function SearchScreen() {
             ) : (
               <View className="h-60 justify-center items-center">
                 <Text className="text-white font-['Montserrat-Medium'] text-lg">
-                  No events found
+                  Aucun événement trouvé
                 </Text>
                 <Text className="text-gray-400 font-['Montserrat-Regular'] text-center mt-2">
-                  Try adjusting your search or filters
+                  Essayez une autre recherche ou modifiez les filtres
                 </Text>
               </View>
             )}

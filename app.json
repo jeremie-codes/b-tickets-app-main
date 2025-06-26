@@ -23,7 +23,7 @@
     },
     "android": {
       "versionCode": 1,
-      "package": "com.jeremiemianda.btickets",
+      "package": "com.balezigroup.btickets",
       "permissions": [
         "android.permission.RECEIVE_BOOT_COMPLETED",
         "android.permission.RECORD_AUDIO"
@@ -43,9 +43,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "ab24ffc8-d887-43a0-94bd-d000311dcf08"
+        "projectId": "ac34d801-898e-4845-94c9-6d57086da426"
       }
     },
-    "owner": "jey-mianda"
+    "owner": "kinconnect"
   }
 }

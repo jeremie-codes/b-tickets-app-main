@@ -2,6 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, EventType, ProfileType, CategoryType, WishlistItem } from '@/types';
 import { API_URL } from '@/configs/index';
+import { router } from 'expo-router';
 
 // Auth functions
 export const login = async (email: string, password: string) => {
@@ -323,24 +324,36 @@ export const getPayToken = async () => {
   }
 };
 
-// Set up axios interceptors for adding token to requests
+
+let interceptorsSetup = false;
+
 export const setupApiInterceptors = async () => {
+  if (interceptorsSetup) return;
+  interceptorsSetup = true;
+
   axios.interceptors.request.use(
     async config => {
       const token = await AsyncStorage.getItem('@b_ticket_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        config.headers['Content-Type'] = 'multipart/form-data'
+        config.headers['Content-Type'] = 'multipart/form-data';
       }
       return config;
     },
-    error => {
+    error => Promise.reject(error)
+  );
+
+  axios.interceptors.response.use(
+    response => response,
+    async error => {
+      if (error.response?.status === 401) {
+        await AsyncStorage.removeItem('@b_ticket_token');
+        await AsyncStorage.removeItem('@b_ticket_user');
+        router.replace('/(auth)/welcome');
+      }
       return Promise.reject(error);
     }
   );
 };
 
-function capitalize(str: string) {
-  str = str.toLowerCase(); // met tout en minuscules d'abord
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+

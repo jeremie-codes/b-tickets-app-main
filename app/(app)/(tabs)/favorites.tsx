@@ -30,7 +30,7 @@ export default function FavoritesScreen() {
   const loadFavorites = async () => {
     try {
       const data = await getFavorites();
-      setFavorites(data);
+      setFavorites(Array.isArray(data) ? data : []);
     } catch (error) {
       showNotification('Chargement des favoris échoué !', 'error');
     } finally {
@@ -53,7 +53,7 @@ export default function FavoritesScreen() {
   }, [showGuide]);
 
   useEffect(() => {
-    const checkGuide = async () => {
+    const checkGuide = () => {
       setShowGuide(true);
         setTimeout(async () => {
           setShowGuide(false);
@@ -118,7 +118,7 @@ export default function FavoritesScreen() {
         <View className="flex-row justify-between items-center">
           <View>
             <Text className="text-gray-400 font-['Montserrat-Regular'] text-sm">
-              Ajouté le {new Date(item.created_at).toLocaleDateString('fr-FR')}
+              Ajouté le {item.created_at ? new Date(item.created_at).toLocaleDateString('fr-FR') : 'Date inconnue'}
             </Text>
           </View>
           <View className="flex-row gap-2">
@@ -143,7 +143,7 @@ export default function FavoritesScreen() {
     <SafeAreaView className="flex-1 bg-background-dark">
       <View className="p-6">
         <Text className="text-white font-['Montserrat-Bold'] text-2xl mb-6">
-          Favories
+          Favoris
         </Text>
 
         {showGuide && (

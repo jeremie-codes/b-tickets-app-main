@@ -56,7 +56,7 @@ export default function TicketsScreen() {
     try {
       const data = await getUserTickets();
       setTickets(data);
-      if(filteredTickets.length === 0) setFilteredTickets(data);
+      setFilteredTickets(data);
     } catch (error) {
       showNotification('Failed to load tickets', 'error');
     } finally {
@@ -80,16 +80,7 @@ export default function TicketsScreen() {
     filterTickets();
   }, [selectedFilter]);
 
-  // const verifyExpire = (ticket: any) => {
-  //   const now = new Date();
-  //   const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-  //   const eventDate = new Date(ticket.event.date);
-  //   const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
-
-  //   return eventDateOnly < nowDateOnly;
-  // }
-
+  
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: bounce.value }],
   }));
@@ -106,13 +97,6 @@ export default function TicketsScreen() {
     } else if (selectedFilter === 'failed') {
       setFilteredTickets(tickets.filter(ticket => ticket.success === 0));
     } 
-    // else if (selectedFilter === 'expired') {
-    //   setFilteredTickets(
-    //     tickets.filter(ticket => {
-    //       return ticket.used_at === null && verifyExpire(ticket) && ticket.success === 1;
-    //     })
-    //   );
-    // }
   };
 
   return (
