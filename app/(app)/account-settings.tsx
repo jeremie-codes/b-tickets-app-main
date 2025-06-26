@@ -29,20 +29,20 @@ export default function AccountSettingsScreen() {
   }, [name, email, picture, user]);
 
   const formatImage = () => {
-    if (user?.profile?.picture) {
-      const imagePath = user.profile.picture
+    const imagePath = user?.profile?.picture;
+    if (imagePath) {
       const relativePath = imagePath.split('/public/')[1];
       const imageUrl = `${APP_URL}/${relativePath}`;
       setPicture(imageUrl);
-      console.log(imageUrl);
     } else {
       setPicture(null);
     }
-  }
+  };
+
 
   useEffect(() => {
-    formatImage()
-  }, [])
+    formatImage();
+  }, [user]);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

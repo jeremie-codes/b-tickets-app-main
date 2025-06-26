@@ -8,8 +8,10 @@ import { getEventById, toggleFavorite, toggleWishlist } from '@/services/api';
 import { EventType } from '@/types';
 import { useNotification } from '@/contexts/NotificationContext';
 import { formatDate, formatTime } from '@/utils/formatters';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function EventDetailsScreen() {
+  const { triggerFavoritesRefresh, triggerWisshRefresh } = useAuth();
   const { id } = useLocalSearchParams<{ id: any }>();
   const { showNotification } = useNotification();
   const [event, setEvent] = useState<EventType | null>(null);
@@ -49,6 +51,7 @@ export default function EventDetailsScreen() {
         result.isFavorite ? 'Évenément ajouté dans favoris' : 'Évenément supprimer dans favoris',
         'success'
       );
+      triggerFavoritesRefresh();
     } catch (error) {
       showNotification('Error de mise à jour des favoris', 'error');
     } finally {
@@ -67,6 +70,7 @@ export default function EventDetailsScreen() {
         result.isWishlist ? 'Évenément ajouté dans la list de souhait' : 'Évenément supprimer dans la list de souhait',
         'success'
       );
+      triggerWisshRefresh();
     } catch (error) {
       showNotification('Error de mise à jour des souhaits', 'error');
     } finally {
@@ -118,7 +122,7 @@ export default function EventDetailsScreen() {
       <StatusBar style="light" />
         <View >
           <Image
-            source={{ uri: event.media[0].original_url }}
+            source={{ uri: event.media[1].original_url }}
             className="w-full"
             resizeMode='cover'
             style={styles.heroImage}
@@ -198,12 +202,11 @@ export default function EventDetailsScreen() {
             </View>
             
             <View className="flex-row items-center gap-4">
-              {event.author_picture ? (
+              {event.media[0].original_url ? (
                   <Image
-                    source={{ uri: event.author_picture }}
-                    style={{ width: 96, height: 96, borderRadius: 48 }}
+                    source={{ uri: event.media[0].original_url }}
                     resizeMode="cover"
-                  />
+                    className="bg-primary-600 w-12 h-12 rounded-full items-center justify-center mt-3" />
                 ) : (
                   <View className="bg-primary-600 w-12 h-12 rounded-full items-center justify-center mt-3">
                     <Text className="text-white font-['Montserrat-Bold'] text-3xl">

@@ -171,7 +171,7 @@ export default function TicketScreen() {
               </View>
               
               <Text className="text-gray-300 font-['Montserrat-SemiBold'] text-center">
-                Ticket ID: {ticket.id} 
+                Ticket Réf: {ticket.reference} 
               </Text>
             </View>}
             
@@ -182,7 +182,7 @@ export default function TicketScreen() {
             </View>}
           </View>
 
-          <View className="flex-row gap-4">
+          {/* <View className="flex-row gap-4">
             <TouchableOpacity 
               className="flex-1 bg-background-card py-4 rounded-xl flex-row items-center justify-center"
               onPress={handleShare}
@@ -202,7 +202,7 @@ export default function TicketScreen() {
                 Télécharger
               </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
       </ScrollView>
   );

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { updateUserProfile, uploadProfileImage, login as apiLogin, register as apiRegister, logout as apiLogout, deleteAccount as apiDeleteAccount } from '@/services/api';
+import { updateUserProfile, updateUserPassword, uploadProfileImage, login as apiLogin, register as apiRegister, logout as apiLogout, deleteAccount as apiDeleteAccount } from '@/services/api';
 import { User, ProfileType } from '@/types';
 
 interface AuthContextType {
@@ -10,10 +10,15 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   updateUser: (userDatas: { name: string; first_name: string; last_name: any, email: string }) => Promise<boolean>;
+  updatePassword: (passwords: { password: string }) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<void>;
   updatePicture: (formData: FormData) => Promise<any>;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
+  triggerFavoritesRefresh: () => void;
+  favoritesRefreshKey: number;
+  triggerWisshRefresh: () => void;
+  wishRefrListReshKey: number;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +28,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
+  const [favoritesRefreshKey, setFavoritesRefreshKey] = useState(Date.now());
+  const [wishRefrListReshKey, setWishRefrListReshKey] = useState(Date.now());
 
   // Load user and token from AsyncStorage on app start
   useEffect(() => {
@@ -30,11 +37,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const storedUser = await AsyncStorage.getItem('@b_ticket_user');
         const storedToken = await AsyncStorage.getItem('@b_ticket_token');
-        
-        if (storedUser && storedToken) {
-          setUser(JSON.parse(storedUser));
+
+        if (storedToken) {
           setToken(storedToken);
         }
+
+        if (storedUser) {
+          try {
+            const parsed = JSON.parse(storedUser);
+            if (parsed && typeof parsed === 'object') {
+              setUser(parsed);
+            } else {
+              console.warn('User data is not an object');
+              await AsyncStorage.removeItem('@b_ticket_user');
+            }
+          } catch (e) {
+            console.warn('Corrupted user data in storage', e);
+            await AsyncStorage.removeItem('@b_ticket_user');
+          }
+        }
+
       } catch (error) {
         console.error('Failed to load user data from storage', error);
       } finally {
@@ -44,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     loadUserAndToken();
   }, []);
+
 
   const storeUserAndToken = async (userData: User, authToken: string) => {
     try {
@@ -96,17 +119,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updatePassword = async (passwords: { password: string }) => {
+    setIsLoading(true);
+    try {
+      const { success } = await updateUserPassword(passwords);
+      return success;
+    } catch (error) {
+      console.error('Mise à jour du mot de passe échouée !', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const updatePicture = async (formData: FormData) => {
     setIsLoading(true);
     try {
       const { success, data } = await uploadProfileImage(formData);
       
-      const users = user;
-      users.profile = data
-            
-      await AsyncStorage.setItem('@b_ticket_user', JSON.stringify(users));
-      setUser(users);
-      
+      if (!user) return; // par sécurité
+
+      const updatedUser = {
+        ...user,
+        profile: data,
+      };
+
+      await AsyncStorage.setItem('@b_ticket_user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+
       return success;
     } catch (error) {
       console.error('Connexion échouée !', error);
@@ -143,7 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       await clearUserAndToken();
     } catch (error) {
-      console.error('Logout failed', error);
+      console.error('Connexion échouée', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -167,6 +207,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const triggerFavoritesRefresh = () => {
+    setFavoritesRefreshKey(Date.now());
+  };
+
+  const triggerWisshRefresh = () => {
+    setWishRefrListReshKey(Date.now());
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -176,10 +224,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading: isLoading || isLoadingInitial,
         login,
         updateUser,
+        updatePassword,
         updatePicture,
         register,
         logout,
         deleteAccount,
+        triggerFavoritesRefresh,
+        favoritesRefreshKey,
+        triggerWisshRefresh,
+        wishRefrListReshKey
       }}
     >
       {!isLoadingInitial && children}

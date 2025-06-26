@@ -20,8 +20,21 @@ export default function HomeScreen() {
     try {
       const data = await getEvents();
       const datap = await getEventsPopular();
-      setFeaturedEvents(datap);
-      setUpcomingEvents(data);
+
+      if (Array.isArray(data)) {
+        setUpcomingEvents(data);
+      } else {
+        console.warn('Données inattendues reçues de getEvents');
+        setUpcomingEvents([]);
+      }
+
+      if (Array.isArray(datap)) {
+        setFeaturedEvents(datap);
+      } else {
+        console.warn('Données inattendues reçues de getEventsPopular');
+        setFeaturedEvents([]);
+      }
+
     } catch (error) {
       showNotification('Chargement des événements échoué !', 'error');
     } finally {
@@ -38,6 +51,14 @@ export default function HomeScreen() {
     setRefreshing(true);
     loadEvents();
   };
+
+  if (!user) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center bg-background-dark">
+        <ActivityIndicator size="large" color="#8b5cf6" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background-dark">
@@ -87,7 +108,7 @@ export default function HomeScreen() {
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={{ paddingRight: 20 }}
                 >
-                  {featuredEvents.map(event => (
+                  {Array.isArray(featuredEvents) && featuredEvents.map(event => (
                     <View key={event.id} className="mr-4" style={{ width: 280 }}>
                       <EventCard event={event} featured />
                     </View>
@@ -100,7 +121,7 @@ export default function HomeScreen() {
                   Événements à venir
                 </Text>
                 <View className="gap-4">
-                  {upcomingEvents.map(event => (
+                  {Array.isArray(upcomingEvents) && upcomingEvents.map(event => (
                     <EventCard key={event.id} event={event} />
                   ))}
                 </View>

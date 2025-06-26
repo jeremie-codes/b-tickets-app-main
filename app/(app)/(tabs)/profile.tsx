@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { ChevronRight, LogOut, Settings, Ticket, ShoppingBag, CircleHelp as HelpCircle, Heart } from 'lucide-react-native';
+import { ChevronRight, LogOut, Settings, Ticket, ShoppingBag, CircleHelp as HelpCircle, Lock } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import { APP_URL } from '@/configs';
@@ -23,15 +23,16 @@ export default function ProfileScreen() {
   };
 
   useEffect(() => {
-    if (user?.profile?.picture) {
-      const imagePath = user?.profile.picture
-      const relativePath = imagePath?.split('/public/')[1];
+    const imagePath = user?.profile?.picture;
+    
+    if (imagePath) {
+      const relativePath = imagePath.split('/public/')[1];
       const imageUrl = `${APP_URL}/${relativePath}`;
       setPicture(imageUrl);
     } else {
       setPicture(null);
     }
-  }, [])
+  }, [user])
 
   const confirmDeleteAccount = () => {
     Alert.alert(
@@ -109,7 +110,7 @@ export default function ProfileScreen() {
             </Text>
           </View>
 
-          <View className="mb-8">
+          <View className="mb-4">
             <Text className="text-gray-400 font-['Montserrat-SemiBold'] mb-3">
               COMPTE
             </Text>
@@ -118,6 +119,14 @@ export default function ProfileScreen() {
               title="Paramètres de Compte" 
               onPress={() => router.push('/(app)/account-settings')}
             />
+            <ProfileOption 
+              icon={<Lock size={22} color="#8b5cf6" />} 
+              title="Modifier le Mot de Passe" 
+              onPress={() => router.push('/(app)/password-settings')}
+            />
+            <Text className="text-gray-400 font-['Montserrat-SemiBold'] mb-3">
+              AUTRES OPTIONS
+            </Text>
             <ProfileOption 
               icon={<Ticket size={22} color="#8b5cf6" />} 
               title="Mes Tickets" 
@@ -130,7 +139,7 @@ export default function ProfileScreen() {
             />
           </View>
 
-          <View className="mb-8">
+          <View className="mb-6">
             <Text className="text-gray-400 font-['Montserrat-SemiBold'] mb-3">
               SUPPORT
             </Text>

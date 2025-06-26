@@ -1,97 +1,143 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
-import { Heart, Trash2 } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import { Trash2 } from 'lucide-react-native';
+import { ChevronsDown} from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNotification } from '@/contexts/NotificationContext';
 import { getFavorites, toggleFavorite } from '@/services/api';
 import { EventType } from '@/types';
 import EventCard from '@/components/EventCard';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+import { useAuth } from '@/contexts/AuthContext';
 
+const AnimatedIcon = Animated.createAnimatedComponent(ChevronsDown);
 export default function FavoritesScreen() {
+  const { favoritesRefreshKey } = useAuth();
   const { showNotification } = useNotification();
   const [favorites, setFavorites] = useState<EventType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [removingItems, setRemovingItems] = useState<Set<number>>(new Set());
+  const [refreshing, setRefreshing] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
+  const bounce = useSharedValue(0);
+
+  const loadFavorites = async () => {
+    try {
+      const data = await getFavorites();
+      setFavorites(data);
+    } catch (error) {
+      showNotification('Chargement des favoris échoué !', 'error');
+    } finally {
+      setIsLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    const loadFavorites = async () => {
-      try {
-        const data = await getFavorites();
-        setFavorites(data);
-      } catch (error) {
-        showNotification('Chargement des favoris échoué !', 'error');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    if (showGuide) {
+      bounce.value = withRepeat(
+        withSequence(
+          withTiming(-10, { duration: 300 }),
+          withTiming(0, { duration: 300 })
+        ),
+        -1,
+        true
+      );
+    }
+  }, [showGuide]);
 
-    loadFavorites();
+  useEffect(() => {
+    const checkGuide = async () => {
+      setShowGuide(true);
+        setTimeout(async () => {
+          setShowGuide(false);
+        }, 5000);
+    };
+    checkGuide();
   }, []);
 
-    const handleRemoveFromFavorite = (item: EventType) => {
-      Alert.alert(
-        "Supprimer de la Favoris",
-        `Êtes-vous sûr de vouloir supprimer "${item.title}" de vos favoris ?`,
-        [
-          {
-            text: "Annuler",
-            style: "cancel"
-          },
-          {
-            text: "Supprimer",
-            style: "destructive",
-            onPress: () => confirmRemoveFromFavorite(item.id)
-          }
-        ]
-      );
-    };
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: bounce.value }],
+  }));
   
-    const confirmRemoveFromFavorite = async (itemId: number) => {
-      setRemovingItems(prev => new Set(prev).add(itemId));
-      try {
-        await toggleFavorite(itemId, true);
-        setFavorites(prev => prev.filter(item => item.id !== itemId));
-        showNotification('Supprimé des favoris avec succès !', 'success');
-      } catch (error) {
-        showNotification('Erreur lors de la suppression', 'error');
-      } finally {
-        setRemovingItems(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(itemId);
-          return newSet;
-        });
-      }
-    };
-  
+  useEffect(() => {
+    loadFavorites();
+  }, [favoritesRefreshKey]);
 
-    const FavoriteItemCard = ({ item }: { item: EventType }) => (
-      <View className="bg-background-card rounded-xl overflow-hidden">
-        <EventCard event={item} />
-        <View className="p-4 border-t border-gray-700">
-          <View className="flex-row justify-between items-center">
-            <View>
-              <Text className="text-gray-400 font-['Montserrat-Regular'] text-sm">
-                Ajouté le {new Date(item.created_at).toLocaleDateString('fr-FR')}
-              </Text>
-            </View>
-            <View className="flex-row gap-2">
-              <TouchableOpacity
-                onPress={() => handleRemoveFromFavorite(item)}
-                disabled={removingItems.has(item.id)}
-                className="bg-red-500/10 border border-red-500 px-3 py-2 rounded-lg"
-              >
-                {removingItems.has(item.id) ? (
-                  <ActivityIndicator size="small" color="#ef4444" />
-                ) : (
-                  <Trash2 size={16} color="#ef4444" />
-                )}
-              </TouchableOpacity>
-            </View>
+    // Pour un rafraîchissement manuel si besoin
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadFavorites();
+  };
+
+  const handleRemoveFromFavorite = (item: EventType) => {
+    Alert.alert(
+      "Supprimer de la Favoris",
+      `Êtes-vous sûr de vouloir supprimer "${item.title}" de vos favoris ?`,
+      [
+        {
+          text: "Annuler",
+          style: "cancel"
+        },
+        {
+          text: "Supprimer",
+          style: "destructive",
+          onPress: () => confirmRemoveFromFavorite(item.id)
+        }
+      ]
+    );
+  };
+
+  const confirmRemoveFromFavorite = async (itemId: number) => {
+    setRemovingItems(prev => new Set(prev).add(itemId));
+    try {
+      await toggleFavorite(itemId, true);
+      setFavorites(prev => prev.filter(item => item.id !== itemId));
+      showNotification('Supprimé des favoris avec succès !', 'success');
+    } catch (error) {
+      showNotification('Erreur lors de la suppression', 'error');
+    } finally {
+      setRemovingItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(itemId);
+        return newSet;
+      });
+    }
+  };
+
+  const FavoriteItemCard = ({ item }: { item: EventType }) => (
+    <View className="bg-background-card rounded-xl overflow-hidden">
+      <EventCard event={item} />
+      <View className="p-4 border-t border-gray-700">
+        <View className="flex-row justify-between items-center">
+          <View>
+            <Text className="text-gray-400 font-['Montserrat-Regular'] text-sm">
+              Ajouté le {new Date(item.created_at).toLocaleDateString('fr-FR')}
+            </Text>
+          </View>
+          <View className="flex-row gap-2">
+            <TouchableOpacity
+              onPress={() => handleRemoveFromFavorite(item)}
+              disabled={removingItems.has(item.id)}
+              className="bg-red-500/10 border border-red-500 px-3 py-2 rounded-lg"
+            >
+              {removingItems.has(item.id) ? (
+                <ActivityIndicator size="small" color="#ef4444" />
+              ) : (
+                <Trash2 size={16} color="#ef4444" />
+              )}
+            </TouchableOpacity>
           </View>
         </View>
       </View>
-    );
+    </View>
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-background-dark">
@@ -99,6 +145,19 @@ export default function FavoritesScreen() {
         <Text className="text-white font-['Montserrat-Bold'] text-2xl mb-6">
           Favories
         </Text>
+
+        {showGuide && (
+          <View className="absolute top-8 self-center items-center z-50">
+            <AnimatedIcon
+              size={40}
+              color="white"
+              style={animatedStyle}
+            />
+            <Text className="mt-1 px-3 py-1 text-white bg-black/80 rounded-md text-sm">
+              Glissez vers le bas pour actualiser
+            </Text>
+          </View>
+        )}
 
         {isLoading ? (
           <View className="h-60 justify-center items-center">
@@ -108,6 +167,14 @@ export default function FavoritesScreen() {
           <ScrollView 
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 100 }}
+            refreshControl={
+              <RefreshControl 
+                refreshing={refreshing} 
+                onRefresh={onRefresh}
+                tintColor="#8b5cf6"
+                colors={["#8b5cf6"]}
+              />
+            }
           >
             {favorites.length > 0 ? (
               <View className="gap-4">

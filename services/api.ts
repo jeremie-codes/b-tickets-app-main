@@ -3,91 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, EventType, ProfileType, CategoryType, WishlistItem } from '@/types';
 import { API_URL } from '@/configs/index';
 
-// For demo purposes, we're simulating API calls
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-// Mock data
-const mockEvents: EventType[] = [
-  {
-    id: '1',
-    title: 'Summer Music Festival',
-    description: 'Join us for the biggest music festival of the year! Featuring top artists from around the world, this three-day event will be filled with amazing performances, great food, and unforgettable memories. Bring your friends and enjoy the summer vibes!',
-    date: '2025-07-15',
-    time: '16:00',
-    location: 'Central Park, New York',
-    price: 89.99,
-    image: 'https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    category: '1',
-    featured: true,
-    isFavorite: false
-  },
-  {
-    id: '2',
-    title: 'Tech Conference 2025',
-    description: 'The most anticipated tech conference of the year is back! Learn about the latest technologies, attend workshops, and network with industry professionals. This is your chance to stay ahead in the tech world.',
-    date: '2025-09-20',
-    time: '09:00',
-    location: 'Convention Center, San Francisco',
-    price: 199.99,
-    image: 'https://images.pexels.com/photos/2774556/pexels-photo-2774556.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    category: '2',
-    featured: true,
-    isFavorite: false
-  },
-  {
-    id: '3',
-    title: 'International Food Festival',
-    description: 'Taste cuisines from around the world at our International Food Festival. With over 50 food stalls representing different countries, this is a food lover\'s paradise. Don\'t miss the cooking demonstrations by renowned chefs!',
-    date: '2025-06-10',
-    time: '12:00',
-    location: 'Riverfront Park, Chicago',
-    price: 45.00,
-    image: 'https://images.pexels.com/photos/5379707/pexels-photo-5379707.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    category: '3',
-    featured: false,
-    isFavorite: false
-  },
-  {
-    id: '4',
-    title: 'Art & Design Expo',
-    description: 'Explore the world of art and design at our annual expo. See works from emerging and established artists, attend panel discussions, and participate in interactive workshops. Perfect for art enthusiasts and professionals alike.',
-    date: '2025-08-05',
-    time: '10:00',
-    location: 'Modern Art Gallery, Los Angeles',
-    price: 25.00,
-    image: 'https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    category: '4',
-    featured: false,
-    isFavorite: false
-  },
-  {
-    id: '5',
-    title: 'Marathon City Run',
-    description: 'Challenge yourself with our annual city marathon. The 42km route takes you through the most scenic parts of the city. All participants receive a medal, and prizes are awarded to top finishers. Register now to secure your spot!',
-    date: '2025-10-12',
-    time: '07:00',
-    location: 'Downtown, Boston',
-    price: 75.00,
-    image: 'https://images.pexels.com/photos/2774895/pexels-photo-2774895.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    category: '5',
-    featured: true,
-    isFavorite: false
-  },
-  {
-    id: '6',
-    title: 'Comedy Night Special',
-    description: 'Laugh your heart out at our Comedy Night Special. We\'ve brought together the funniest comedians for an evening of entertainment. Grab your tickets now for a night filled with laughter and fun!',
-    date: '2025-07-28',
-    time: '20:00',
-    location: 'Comedy Club, Austin',
-    price: 35.00,
-    image: 'https://images.pexels.com/photos/713149/pexels-photo-713149.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    category: '6',
-    featured: false,
-    isFavorite: false
-  }
-];
-
 // Auth functions
 export const login = async (email: string, password: string) => {
   try {
@@ -98,11 +13,6 @@ export const login = async (email: string, password: string) => {
     });
 
     const { token, user } = response.data.data;
-
-    console.log(user.id);
-    
-    //Stocke le token
-    // await AsyncStorage.setItem('@b_ticket_token', token);
 
     //Configure les intercepteurs pour les requêtes futures
     await setupApiInterceptors();
@@ -154,7 +64,6 @@ export const logout = async (token: string) => {
 };
 
 // User profile functions
-// export const updateUserProfile = async (userData: { name: string; email: string; profileImage?: string }) => {
 export const updateUserProfile = async (userData: { name: string; first_name: string; last_name: any, email: string }) => {
   
   try {
@@ -189,18 +98,18 @@ export const updateUserProfile = async (userData: { name: string; first_name: st
   }
 };
 
-// export const uploadProfileImage = async (base64Image: string) => {
-//   try {
-//     const response = await axios.post(`${API_URL}/user/upload-profile-image`, {
-//       image: base64Image
-//     });
-//     const { success, imageUrl } = response.data;
-//     return { success, imageUrl };
-//   } catch (error: any) {
-//     console.log(error.response?.data?.message || 'Image upload failed');
-//     throw error;
-//   }
-// };
+export const updateUserPassword = async (passwordData: { password: string }) => {
+  
+  try {
+    const response = await axios.post(`${API_URL}/profile`, passwordData);
+    const { success } = response.data;
+    
+    return { success };
+  } catch (error: any) {
+    console.log(error.response?.data || 'Profile update failed');
+    throw error;
+  }
+};
 
 export const uploadProfileImage = async (formData: FormData) => {
   try {
@@ -230,9 +139,7 @@ export const deleteAccount = async (token: string) => {
 
 // Events functions
 export const getEvents = async () => {
-  // await delay(1000); // Simulate API delay
-  // In a real app, this would be a GET request to the API
-  // return mockEvents;
+
   try {
 
     const response = await axios.get(`${API_URL}/event/recents`);

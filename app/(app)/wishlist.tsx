@@ -4,17 +4,31 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { ArrowLeft, Trash2, ShoppingBag } from 'lucide-react-native';
+import { ChevronsDown} from 'lucide-react-native';
 import { useNotification } from '@/contexts/NotificationContext';
 import { getWishlist, toggleWishlist } from '@/services/api';
 import { EventType, WishlistItem } from '@/types';
 import EventCard from '@/components/EventCard';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+import { useAuth } from '@/contexts/AuthContext';
+
+const AnimatedIcon = Animated.createAnimatedComponent(ChevronsDown);
 
 export default function WishlistScreen() {
+  const { wishRefrListReshKey } = useAuth();
   const { showNotification } = useNotification();
-  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [wishlist, setWishlist] = useState<EventType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [removingItems, setRemovingItems] = useState<Set<number>>(new Set());
   const [refreshing, setRefreshing] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
+  const bounce = useSharedValue(0);
 
   const loadWishlist = async () => {
     try {
@@ -30,7 +44,34 @@ export default function WishlistScreen() {
 
   useEffect(() => {
     loadWishlist();
+  }, [wishRefrListReshKey]);
+
+   useEffect(() => {
+    if (showGuide) {
+      bounce.value = withRepeat(
+        withSequence(
+          withTiming(-10, { duration: 300 }),
+          withTiming(0, { duration: 300 })
+        ),
+        -1,
+        true
+      );
+    }
+  }, [showGuide]);
+
+  useEffect(() => {
+    const checkGuide = async () => {
+      setShowGuide(true);
+        setTimeout(async () => {
+          setShowGuide(false);
+        }, 5000);
+    };
+    checkGuide();
   }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: bounce.value }],
+  }));
 
   const handleRemoveFromWishlist = (item: EventType) => {
     Alert.alert(
@@ -142,6 +183,19 @@ export default function WishlistScreen() {
             Événements que vous souhaitez réserver plus tard
           </Text>
         </View>
+
+        {showGuide && (
+          <View className="absolute top-8 self-center items-center z-50">
+            <AnimatedIcon
+              size={40}
+              color="white"
+              style={animatedStyle}
+            />
+            <Text className="mt-1 px-3 py-1 text-white bg-black/80 rounded-md text-sm">
+              Glissez vers le bas pour actualiser
+            </Text>
+          </View>
+        )}
 
         {isLoading ? (
           <View className="flex-1 justify-center items-center">

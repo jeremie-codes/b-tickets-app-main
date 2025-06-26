@@ -2,14 +2,16 @@
   "expo": {
     "name": "B-TICKETS",
     "slug": "b-tickets",
-    "version": "0.1.2",
+    "scheme": "btickets",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon-app.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/images/casque.png",
+      "image": "./assets/images/icon-app.png",
       "resizeMode": "contain",
-      "backgroundColor": "#240233"
+      "backgroundColor": "#3e0059",
+      "imageWidth": 200
     },
     "assetBundlePatterns": [
       "**/*"
@@ -20,7 +22,7 @@
       "buildNumber": "4"
     },
     "android": {
-      "versionCode": 3,
+      "versionCode": 1,
       "package": "com.jeremiemianda.btickets",
       "permissions": [
         "android.permission.RECEIVE_BOOT_COMPLETED",

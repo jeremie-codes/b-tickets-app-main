@@ -47,7 +47,6 @@ export default function TicketsScreen() {
       setShowGuide(true);
         setTimeout(async () => {
           setShowGuide(false);
-          await AsyncStorage.setItem('seenPullGuide', 'true');
         }, 5000);
     };
     checkGuide();

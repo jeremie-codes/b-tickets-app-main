@@ -16,12 +16,12 @@ export default function WelcomeScreen() {
         className="absolute top-0 left-0 right-0 bottom-0"
       />
 
-      <View className="flex-1 flex-col justify-end gap-4 items-center px-6 pb-8">
+      <View className="flex-1 flex-col justify-end gap-4 items-center px-12 pb-8">
 
         <View className="w-full gap-4 mt-4">
           <TouchableOpacity
             onPress={() => router.push('/(auth)/login')}
-            className="bg-primary-600 py-4 rounded-xl w-full items-center border"
+            className="bg-primary-600/50 py-4 rounded-xl w-full items-center border border-primary-700"
             activeOpacity={0.8}
           >
             <Text className="font-['Montserrat-SemiBold'] text-white text-lg">

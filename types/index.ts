@@ -13,6 +13,7 @@ export interface User {
   name: string;
   profile: ProfileType;
   email: string;
+  password?: string;
 }
 
 export interface CategoryType {
@@ -81,14 +82,6 @@ export interface EventType {
   updated_at: string;
   deleted_at: string | null;
 }
-
-// export interface TicketType {
-//   id: string;
-//   event: EventType;
-//   status: 'active' | 'used' | 'expired';
-//   purchaseDate: string;
-//   qrCode: string;
-// }
 
 export interface TicketType {
   id: number;
