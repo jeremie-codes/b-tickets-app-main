@@ -36,6 +36,7 @@ export default function TicketItem({ ticket }: TicketItemProps) {
   };
 
   const getStatusTextColor = (status: string) => {
+    // console.log(status)
     switch (status) {
       case 'active':
         return 'text-green-500';
@@ -53,17 +54,6 @@ export default function TicketItem({ ticket }: TicketItemProps) {
   };
 
   useEffect(() => {
-
-    // const verifyExpire = () => {
-    //   const now = new Date();
-    //   const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    //   const eventDate = new Date(ticket.event.date);
-    //   const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
-
-    //   return eventDateOnly < nowDateOnly;
-    // }
-
     if (ticket.used_at === null && ticket.success === 1) {
       setState('active');
     } else if ( ticket.success === null) {
@@ -73,10 +63,7 @@ export default function TicketItem({ ticket }: TicketItemProps) {
     } else if (ticket.used_at !== null) {
       setState('utilisé');
     } 
-    // else if (ticket.used_at === null && verifyExpire() && ticket.success === 1) {
-    //   setState('expiré');
-    // }
-  }, [])
+  }, [ticket])
 
   return (
     <TouchableOpacity
@@ -91,7 +78,7 @@ export default function TicketItem({ ticket }: TicketItemProps) {
             {ticket.event.title}
           </Text>
           <View className={`px-3 py-1 rounded-full border ${getStatusColor(state)}`}>
-            <Text className={`font-['Montserrat-Medium'] text-xs ${getStatusTextColor(state)}`}>
+            <Text className={`font-['Montserrat-Medium'] text-xs ${getStatusTextColor(state.toLowerCase())}`}>
               {state.charAt(0).toUpperCase() + state.slice(1)}
             </Text>
           </View>

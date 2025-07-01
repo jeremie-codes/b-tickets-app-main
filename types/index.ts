@@ -14,6 +14,7 @@ export interface User {
   profile: ProfileType;
   email: string;
   password?: string;
+  created_at: string;
 }
 
 export interface CategoryType {
@@ -60,6 +61,21 @@ export interface EventPrice {
   deleted_at: string | null;
 }
 
+export interface EventPromos {
+  id: number;
+  code: string;
+  description: string;
+  start_at: string;
+  end_at: number;
+  event_id: number;
+  type: string;
+  price_id: number;
+  active: number;
+  value_usd: string;
+  value_cdf: string;
+  value_percentage: string;
+}
+
 export interface EventType {
   id: number;
   title: string;
@@ -78,6 +94,7 @@ export interface EventType {
   category: CategoryType;
   media: EventMedia[];
   prices: EventPrice[];
+  promos: EventPromos[];
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

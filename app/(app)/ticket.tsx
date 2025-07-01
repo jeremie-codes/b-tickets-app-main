@@ -70,6 +70,8 @@ export default function TicketScreen() {
         return 'text-gray-400';
       case 'en attente':
         return 'text-yellow-500';
+      case 'échoué':
+        return 'text-red-500';
       default:
         return 'text-gray-400';
     }

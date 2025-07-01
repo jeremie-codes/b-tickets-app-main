@@ -5,18 +5,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { ArrowLeft, CreditCard, Smartphone, Plus, Minus, Currency } from 'lucide-react-native';
 import { getEventById, processPayment, getPayToken } from '@/services/api';
-import { EventType, EventPrice } from '@/types';
+import { EventType, EventPrice, EventPromos } from '@/types';
 import { useNotification } from '@/contexts/NotificationContext';
 import { formatDate, formatTime } from '@/utils/formatters';
 import { WebView } from 'react-native-webview';
-import { APP_URL } from '@/configs/index';
 const { height } = Dimensions.get('window');
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PaymentScreen() {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const { showNotification } = useNotification();
   const [event, setEvent] = useState<EventType | null>(null);
+  const [promos, setPromos] = useState<EventPromos[]>([]);
+  const [codepromoEntry, setCodepromoEntry] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'mobile'>('card');
   const [mobileNumber, setMobileNumber] = useState('');
@@ -33,8 +33,7 @@ export default function PaymentScreen() {
 
   useEffect(() => {
     const loadEvent = async () => {
-      if (!eventId) return;
-      
+      if (!eventId) return;      
       try {
         const data = await getEventById(eventId);
         setEvent(data);
@@ -51,6 +50,10 @@ export default function PaymentScreen() {
 
     loadEvent();
   }, [eventId]);
+
+  useEffect(() => {
+      setPromos(event?.promos ?? [])
+  }, [event]);
 
   const handleQuantityChange = (increment: boolean) => {
     if (increment) {
@@ -82,13 +85,57 @@ export default function PaymentScreen() {
         return;
       }
     }
+    
+    let amount = selectedPriceCategory.amount;
+    let currency = selectedPriceCategory.currency.toUpperCase();
+    let promo_id = undefined;
 
+    if (codepromoEntry) {
+      const promoCode = promos.find(promo => promo.code == codepromoEntry);
+
+      if (promoCode) {
+
+        promo_id =  promoCode.id
+        
+        if (promoCode.type.toLowerCase() === 'amount' )
+        {
+          if (currency === 'USD' )
+          {
+
+            const resPercent = parseInt(promoCode.value_usd);
+            amount = amount - resPercent;
+            
+          } else {
+
+            const resPercent = parseInt(promoCode.value_cdf);
+            amount = amount - resPercent;
+          
+          }
+
+        } else
+        {
+
+          const resPercent = (selectedPriceCategory.amount * parseInt(promoCode.value_percentage)) / 100;
+          amount = amount - resPercent;
+
+        }
+      }
+
+      else {
+        showNotification(`Code promo non trouvé !`, 'error');
+        return;
+      }
+
+    }
+    
     setIsProcessing(true);
     try {
+
       const paymentData = {
         event_id: event.id,
-        amount: selectedPriceCategory.amount,
-        currency: selectedPriceCategory.currency.toUpperCase(),
+        amount,
+        promo_id,
+        currency,
         quantity: ticketQuantity,
         price_id: selectedPriceCategory.id,
         type: paymentMethod,
@@ -108,7 +155,7 @@ export default function PaymentScreen() {
 
       showNotification('Réservation effectué, veillez finaliser votre paiement !', 'success');
     } catch (error) {
-      showNotification('Réservation échoué', 'error');
+      showNotification('Une erreur s\'est produit, Réservation échoué', 'error');
     } finally {
       setIsProcessing(false);
     }
@@ -391,6 +438,22 @@ export default function PaymentScreen() {
                 ) : null}
               </View>
             )}
+
+            <View className="mb-8">
+                <Text className="text-white font-['Montserrat-Medium'] mb-2">Code Promo (Optionel)</Text>
+                <TextInput
+                  value={codepromoEntry}
+                  onChangeText={setCodepromoEntry}
+                  placeholder="Entrer le code promo sinon laissez vide"
+                  placeholderTextColor="#6b7280"
+                  maxLength={12}
+                  className={`bg-background-elevated text-white p-4 rounded-xl font-['Montserrat-Regular']
+                    ${error ? 'border border-red-500' : ''}`}
+                />
+                {error ? (
+                  <Text className="text-red-500 text-sm mt-1 px-1">{error}</Text>
+                ) : null}
+              </View>
 
             <TouchableOpacity
               onPress={handlePayment}

@@ -364,7 +364,12 @@ export default function AccountSettingsScreen() {
                     Membre depuis
                   </Text>
                   <Text className="text-white font-['Montserrat-Medium']">
-                    Janvier 2025
+                    {new Date(user?.created_at || '').toLocaleDateString('fr-FR', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    }) || 'N/A'
+                     }
                   </Text>
                 </View>
                 <View className="flex-row justify-between">

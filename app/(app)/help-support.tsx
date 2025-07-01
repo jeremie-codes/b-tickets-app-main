@@ -21,7 +21,7 @@ export default function HelpSupportScreen() {
   };
 
   const handlePhoneSupport = () => {
-    Linking.openURL('tel:+1234567890');
+    Linking.openURL('tel:+243812557008');
   };
 
   const handleExternalLink = (url: string) => {

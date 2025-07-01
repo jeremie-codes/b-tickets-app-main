@@ -18,8 +18,11 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "",
-      "buildNumber": "4"
+      "bundleIdentifier": "com.balezigroup.btickets",
+      "buildNumber": "4",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "versionCode": 1,
@@ -43,9 +46,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "ac34d801-898e-4845-94c9-6d57086da426"
+        "projectId": "4ed4c6a7-62bd-4a3d-9515-b99a47639d31"
       }
     },
-    "owner": "kinconnect"
+    "owner": "hopebalezi"
   }
 }
