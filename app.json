@@ -1,9 +1,9 @@
 {
   "expo": {
     "name": "B-TICKETS",
-    "slug": "b-tickets",
+    "slug": "tickets-app",
     "scheme": "btickets",
-    "version": "1.0.2",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon-app.png",
     "userInterfaceStyle": "light",
@@ -18,18 +18,21 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.balezigroup.btickets",
-      "buildNumber": "4",
+      "bundleIdentifier": "com.btickets.app",
+      "buildNumber": "5",
       "infoPlist": {
+        "NSCameraUsageDescription": "Cette application a besoin d'accéder à la caméra pour permettre la capture de photos de billets ou d'événements.",
+        "NSPhotoLibraryUsageDescription": "Cette application a besoin d'accéder à votre photothèque pour permettre la sauvegarde ou la sélection de photos.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "versionCode": 1,
-      "package": "com.balezigroup.btickets",
+      "versionCode": 2,
+      "package": "com.btickets.app",
       "permissions": [
-        "android.permission.RECEIVE_BOOT_COMPLETED",
-        "android.permission.RECORD_AUDIO"
+        "CAMERA",
+        "RECORD_AUDIO",
+        "READ_MEDIA_IMAGES"
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon-app.png",
@@ -46,9 +49,8 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "4ed4c6a7-62bd-4a3d-9515-b99a47639d31"
+        "projectId": "eab52e2d-f701-4b87-a2d3-5115a710a8ca"
       }
-    },
-    "owner": "hopebalezi"
+    }
   }
 }
