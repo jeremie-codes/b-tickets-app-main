@@ -5,7 +5,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { ArrowLeft, Camera, User, Mail, Save } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
-// import * as Image from 'expo-image-picker';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import { APP_URL } from '@/configs';

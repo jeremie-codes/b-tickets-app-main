@@ -90,6 +90,11 @@ export default function PaymentScreen() {
     let currency = selectedPriceCategory.currency.toUpperCase();
     let promo_id = undefined;
 
+    if (currency == "USD" && getTotalPrice() < 2) {
+      showNotification('Vous ne pouvez pas reserver par carte avec moins de 2$', 'info')
+      return
+    }
+
     if (codepromoEntry) {
       const promoCode = promos.find(promo => promo.code == codepromoEntry);
 

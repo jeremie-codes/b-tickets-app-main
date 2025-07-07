@@ -3,7 +3,7 @@
     "name": "B-TICKETS",
     "slug": "tickets-app",
     "scheme": "btickets",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon-app.png",
     "userInterfaceStyle": "light",
@@ -19,15 +19,17 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.btickets.app",
-      "buildNumber": "5",
+      "buildNumber": "6",
       "infoPlist": {
         "NSCameraUsageDescription": "Cette application a besoin d'accéder à la caméra pour permettre la capture de photos de billets ou d'événements.",
         "NSPhotoLibraryUsageDescription": "Cette application a besoin d'accéder à votre photothèque pour permettre la sauvegarde ou la sélection de photos.",
+        "NSPhotoLibraryAddUsageDescription": "Cette application a besoin d'ajouter des photos à votre photothèque, par exemple lors de la sauvegarde d'une photo de billet.",
+        "NSMicrophoneUsageDescription": "Cette application peut utiliser le microphone lors de la capture de vidéos ou d'enregistrements audio.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "versionCode": 2,
+      "versionCode": 3,
       "package": "com.btickets.app",
       "permissions": [
         "CAMERA",
@@ -51,6 +53,15 @@
       "eas": {
         "projectId": "eab52e2d-f701-4b87-a2d3-5115a710a8ca"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera"
+        }
+      ]
+    ]
   }
 }
