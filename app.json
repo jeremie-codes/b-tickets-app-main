@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/icon-app.png",
       "resizeMode": "contain",
-      "backgroundColor": "#3e0059",
+      "backgroundColor": "#222222",
       "imageWidth": 200
     },
     "assetBundlePatterns": [
@@ -19,7 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.btickets.app",
-      "buildNumber": "6",
+      "buildNumber": "7",
       "infoPlist": {
         "NSCameraUsageDescription": "Cette application a besoin d'accéder à la caméra pour permettre la capture de photos de billets ou d'événements.",
         "NSPhotoLibraryUsageDescription": "Cette application a besoin d'accéder à votre photothèque pour permettre la sauvegarde ou la sélection de photos.",
