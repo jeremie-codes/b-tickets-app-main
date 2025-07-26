@@ -58,8 +58,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos",
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera"
+          "photosPermission": "L'application accède à vos photos pour vous permettre de définir votre image de profil.",
+          "cameraPermission": "L'application accède à votre caméra pour vous permettre de prendre la photo de profile."
         }
       ]
     ]
