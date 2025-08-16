@@ -19,7 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.btickets.app",
-      "buildNumber": "7",
+      "buildNumber": "8",
       "infoPlist": {
         "NSCameraUsageDescription": "Cette application a besoin d'accéder à la caméra pour permettre la capture de photos de billets ou d'événements.",
         "NSPhotoLibraryUsageDescription": "Cette application a besoin d'accéder à votre photothèque pour permettre la sauvegarde ou la sélection de photos.",
@@ -29,7 +29,7 @@
       }
     },
     "android": {
-      "versionCode": 3,
+      "versionCode": 4,
       "package": "com.btickets.app",
       "permissions": [
         "CAMERA",
@@ -38,7 +38,7 @@
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon-app.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#222222"
       }
     },
     "web": {
